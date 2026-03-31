@@ -1,3 +1,6 @@
+import { db } from './firebase-config.js';
+import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
 class VisitorRegistrationForm extends HTMLElement {
     constructor() {
         super();
@@ -101,23 +104,25 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.querySelector('#visitorForm').addEventListener('submit', this._handleSubmit.bind(this));
     }
 
-    _handleSubmit(event) {
+    async _handleSubmit(event) {
         event.preventDefault(); // Prevent page reload
         const form = event.target;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
-        console.log('--- 방문 신청 정보 ---');
-        console.log('방문객 성명:', data.visitorName);
-        console.log('회사명:', data.company);
-        console.log('연락처:', data.contact);
-        console.log('차량 번호:', data.carPlate);
-        console.log('방문 예정 일시:', data.visitDateTime);
-        console.log('담당 직원 성명:', data.hostName);
-        console.log('---------------------');
-
-        alert('방문 신청이 완료되었습니다. (개발자 콘솔에서 내용을 확인하세요)');
-        form.reset();
+        try {
+            // Add a new document with a generated ID
+            const docRef = await addDoc(collection(db, "visitRequests"), {
+                ...data,
+                timestamp: new Date() // Add a server timestamp
+            });
+            console.log("Document written with ID: ", docRef.id);
+            alert('방문 신청 정보가 Firebase에 안전하게 저장되었습니다.');
+            form.reset();
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            alert('오류: 방문 신청 정보를 저장하는 데 실패했습니다. 콘솔을 확인해주세요.');
+        }
     }
 }
 

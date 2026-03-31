@@ -12,7 +12,7 @@ This project aims to build a comprehensive smart office management platform. The
 
 *   **Functionality:** A web-based form for internal employees or external visitors to submit visit details in advance.
     *   **Input Fields:** Visitor Name, Company, Contact, Car Plate Number, Visit Date & Time, Host Employee Name.
-    *   **Action:** A "Submit Application" button that captures the form data. Initially, the data will be logged to the browser console for verification.
+    *   **Action:** A "Submit Application" button that captures the form data. The data will be stored in a Firebase Firestore database.
 *   **Design Philosophy:**
     *   **Aesthetics:** A modern, clean, and professional user interface that is intuitive and easy to navigate.
     *   **Color Palette:** A primary theme of blues and grays to convey trust and stability, with accent colors for interactive elements.
@@ -24,10 +24,13 @@ This project aims to build a comprehensive smart office management platform. The
 
 ## **3. Current Development Plan**
 
-**Objective:** Create the front-end for the visitor pre-registration form.
+**Objective:** Integrate Firebase to store visitor registration data.
 
-1.  **`index.html`:** Set up the main HTML structure. This includes a header for the page title and a main content area to hold the registration form component.
-2.  **`style.css`:** Implement the core visual design. This includes setting up the background, typography, color variables, and layout rules for a responsive experience.
-3.  **`main.js`:** Create a `visitor-registration-form` Web Component. This component will encapsulate the form's HTML, CSS, and JavaScript, making it reusable and easy to manage.
-    *   The component will use Shadow DOM for style isolation.
-    *   It will handle the form's submission event, collect the data, and log it to the console as a placeholder for future backend integration.
+1.  **Configure Firebase:** Set up the necessary Firebase configuration files and add the Firebase SDK scripts to the project to enable database communication.
+2.  **`firebase-config.js`:** Create a dedicated module to initialize the Firebase application. This will keep the configuration details separate and organized.
+3.  **`index.html`:** Update the main HTML file to include the Firebase SDKs for core functionality and the Firestore database.
+4.  **`main.js` (Web Component):** Modify the `visitor-registration-form` component.
+    *   Import the Firebase database instance from `firebase-config.js`.
+    *   Update the `_handleSubmit` method: instead of logging to the console, it will now save the submitted form data to a `visitRequests` collection in the Firestore database.
+    *   Provide clear user feedback upon successful submission.
+5.  **GitHub Sync:** Commit and push all changes to the remote repository.
