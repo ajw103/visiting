@@ -171,9 +171,14 @@ class VisitorRegistrationForm extends HTMLElement {
                     <label for="contact">연락처</label>
                     <input type="tel" id="contact" name="contact" required>
                 </div>
-                <div class="form-group">
-                    <label for="carPlate">차량 번호 (예: 12가 3456)</label>
-                    <input type="text" id="carPlate" name="carPlate">
+                <div class="form-group" id="carPlateGroup">
+                    <label>차량 번호 (예: 12가 3456)</label>
+                    <div class="car-plate-list" id="carPlateList">
+                        <div class="car-plate-row">
+                            <input type="text" name="carPlate" placeholder="차량 번호 입력">
+                        </div>
+                    </div>
+                    <button type="button" class="add-car-btn" id="addCarBtn">+ 차량 추가</button>
                 </div>
                 <div class="form-group">
                     <label for="visitDate">방문 예정 일자</label>
