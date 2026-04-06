@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주차 관리자 페이지</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #007bff;
+      --primary-dk: #0056b3;
+      --success:    #28a745;
+      --warning:    #ffc107;
+      --danger:     #dc3545;
+      --gray-100:   #f8f9fa;
+      --gray-200:   #e9ecef;
+      --gray-400:   #ced4da;
+      --gray-600:   #6c757d;
+      --gray-800:   #343a40;
+      --white:      #ffffff;
+      --shadow:     0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .admin-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
+    .header-left h1 { font-size: 1.25rem; font-weight: 700; color: var(--gray-800); }
+    .header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn-primary   { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dk); }
+    .btn-outline   { background: var(--white); color: var(--gray-800); border: 1px solid var(--gray-400); }
+    .btn-outline:hover { background: var(--gray-100); }
+    .btn-success   { background: var(--success); color: var(--white); }
+    .btn-success:hover { opacity: 0.9; }
+
+    /* API 상태 배지 */
+    .api-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .api-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .api-badge.connected    { background: #d4edda; color: #155724; }
+    .api-badge.connected::before { background: var(--success); }
+    .api-badge.disconnected { background: #fff3cd; color: #856404; }
+    .api-badge.disconnected::before { background: var(--warning); }
+
+    /* ── Main ── */
+    .main-content { padding: 1.5rem 2rem; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Summary Cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .summary-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .summary-card .label { font-size: 0.8rem; color: var(--gray-600); margin-bottom: 0.4rem; }
+    .summary-card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .summary-card.total   .value { color: var(--primary); }
+    .summary-card.today   .value { color: #6f42c1; }
+    .summary-card.entered .value { color: var(--warning); }
+    .summary-card.exited  .value { color: var(--success); }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--gray-400);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: var(--white);
+    }
+    .filter-bar input:focus,
+    .filter-bar select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+    }
+    #searchInput { flex: 1; min-width: 180px; }
+
+    /* ── Table ── */
+    .table-wrapper {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .table-header h2 { font-size: 1rem; font-weight: 700; }
+    .record-count { font-size: 0.85rem; color: var(--gray-600); }
+
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      min-width: 1000px;
+    }
+    thead { background: var(--gray-100); }
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--gray-600);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--gray-100); }
+
+    /* 입출차 시간 셀 */
+    .time-cell.has-time  { color: var(--gray-800); font-weight: 500; }
+    .time-cell.no-time   { color: var(--gray-400); }
+    .awaiting            { font-style: italic; }
+
+    /* 그룹 헤더 (입출차) */
+    th.parking-group {
+      background: #e8f4fd;
+      color: #0056b3;
+    }
+
+    /* 상태 배지 */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-pending { background: #e9ecef; color: var(--gray-600); }
+    .status-entered { background: #fff3cd; color: #856404; }
+    .status-exited  { background: #d4edda; color: #155724; }
+
+    /* 빈 상태 */
+    #emptyState {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--gray-600);
+    }
+    #emptyState p { margin-top: 0.5rem; font-size: 0.9rem; }
+
+    /* ── 로딩 오버레이 ── */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--gray-800);
+      color: var(--white);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 300;
+      white-space: nowrap;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast.error { background: var(--danger); }
+
+    /* ── 주차관제 API 안내 배너 ── */
+    .api-info-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: #664d03;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .api-info-banner.hidden { display: none; }
+    .api-info-banner strong { display: block; margin-bottom: 0.2rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .main-content { padding: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-header { padding: 0.75rem 1rem; }
+      .header-left h1 { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 로딩 오버레이 -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <span>데이터 불러오는 중...</span>
+</div>
+
+<!-- 토스트 알림 -->
+<div id="toast" class="toast"></div>
+
+<!-- 헤더 -->
+<header class="admin-header">
+  <div class="header-left">
+    <h1>주차 관리자 페이지</h1>
+    <span id="apiStatus" class="api-badge">확인 중...</span>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
+    <button class="btn btn-success" id="exportBtn">↓ CSV 내보내기</button>
+    <a href="index.html" class="btn btn-outline">← 신청 페이지로</a>
+  </div>
+</header>
+
+<main class="main-content">
+
+  <!-- 주차관제 API 미연결 안내 배너 -->
+  <div class="api-info-banner" id="apiBanner">
+    <span>ℹ</span>
+    <div>
+      <strong>주차관제 API 미연결 상태입니다.</strong>
+      입차·출차 시간은 주차관제 업체로부터 API를 전달받은 후 <code>parking-api.js</code>에 연동하면 자동으로 표시됩니다.
+    </div>
+  </div>
+
+  <!-- 요약 카드 -->
+  <div class="summary-grid">
+    <div class="summary-card total">
+      <div class="label">전체 신청</div>
+      <div class="value" id="totalCount">-</div>
+    </div>
+    <div class="summary-card today">
+      <div class="label">오늘 방문 예정</div>
+      <div class="value" id="todayCount">-</div>
+    </div>
+    <div class="summary-card entered">
+      <div class="label">현재 입차중</div>
+      <div class="value" id="enteredCount">-</div>
+    </div>
+    <div class="summary-card exited">
+      <div class="label">출차 완료</div>
+      <div class="value" id="exitedCount">-</div>
+    </div>
+  </div>
+
+  <!-- 필터 바 -->
+  <div class="filter-bar">
+    <input type="text"  id="searchInput"  placeholder="이름, 회사, 차량번호, 담당직원 검색">
+    <input type="date"  id="dateFilter"   title="방문 예정일 필터">
+    <select id="statusFilter">
+      <option value="">전체 상태</option>
+      <option value="pending">신청됨</option>
+      <option value="entered">입차중</option>
+      <option value="exited">출차완료</option>
+    </select>
+  </div>
+
+  <!-- 테이블 -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <h2>방문 신청 목록</h2>
+      <span class="record-count" id="recordCount"></span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>신청일시</th>
+            <th>방문객 성명</th>
+            <th>회사명</th>
+            <th>연락처</th>
+            <th>차량번호</th>
+            <th>방문 예정 일자 / 시간</th>
+            <th>방문 목적</th>
+            <th>담당직원 소속 및 성명</th>
+            <th class="parking-group">입차 시간 ⓟ</th>
+            <th class="parking-group">출차 시간 ⓟ</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody id="visitTableBody"></tbody>
+      </table>
+      <div id="emptyState">
+        <div style="font-size:2rem;">📋</div>
+        <p>표시할 방문 신청 내역이 없습니다.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script src="firebase-config.js" type="module"></script>
+<script src="admin.js" type="module"></script>
+
+<script type="module">
+  // API 연결 시 안내 배너 숨기기
+  import { IS_API_CONNECTED } from './parking-api.js';
+  if (IS_API_CONNECTED) {
+    document.getElementById('apiBanner').classList.add('hidden');
+  }
+</script>
+
+<script>
+  // 레코드 수 표시 (admin.js의 renderTable 이후 업데이트)
+  const _origRender = window._renderHook;
+  const observer = new MutationObserver(() => {
+    const rows = document.getElementById('visitTableBody')?.querySelectorAll('tr').length ?? 0;
+    const el = document.getElementById('recordCount');
+    if (el) el.textContent = rows > 0 ? `총 ${rows}건` : '';
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const tbody = document.getElementById('visitTableBody');
+    if (tbody) observer.observe(tbody, { childList: true });
+  });
+</script>
+
+</body>
+</html>

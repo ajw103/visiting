@@ -1,12 +1,32 @@
 import { db } from './firebase-config.js';
 import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
+const TIME_SLOTS = [
+    '09:00 ~ 10:00',
+    '10:00 ~ 11:00',
+    '11:00 ~ 12:00',
+    '12:00 ~ 13:00',
+    '13:00 ~ 14:00',
+    '14:00 ~ 15:00',
+    '15:00 ~ 16:00',
+    '16:00 ~ 17:00',
+    '17:00 ~ 18:00',
+    '18:00 ~ 19:00',
+];
+
+const VISIT_PURPOSES = [
+    '비즈니스 미팅',
+    '업무 협의',
+    '계약 및 서류 처리',
+    '시설 견학',
+    '기타 방문',
+];
+
 class VisitorRegistrationForm extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
 
-        // Component-specific styles
         const style = document.createElement('style');
         style.textContent = `
             :host {
@@ -29,18 +49,33 @@ class VisitorRegistrationForm extends HTMLElement {
             }
             input[type="text"],
             input[type="tel"],
-            input[type="datetime-local"] {
+            input[type="date"],
+            select {
                 width: 100%;
                 padding: 0.75rem;
                 border: 1px solid var(--light-gray, #e9ecef);
                 border-radius: 4px;
                 font-size: 1rem;
                 box-sizing: border-box;
+                background-color: #fff;
+                color: #212529;
+                appearance: auto;
+                -webkit-appearance: auto;
             }
-            input:focus {
+            input[type="date"] {
+                cursor: pointer;
+            }
+            select {
+                cursor: pointer;
+            }
+            input:focus,
+            select:focus {
                 outline: none;
                 border-color: var(--primary-color, #007bff);
                 box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+            select option[value=""] {
+                color: #6c757d;
             }
             .submit-btn {
                 width: 100%;
@@ -57,6 +92,10 @@ class VisitorRegistrationForm extends HTMLElement {
             .submit-btn:hover {
                 background-color: #0056b3;
             }
+            .submit-btn:disabled {
+                background-color: #ced4da;
+                cursor: not-allowed;
+            }
 
             @media (max-width: 480px) {
                 .form-container {
@@ -65,7 +104,14 @@ class VisitorRegistrationForm extends HTMLElement {
             }
         `;
 
-        // HTML structure of the form
+        const timeSlotOptions = TIME_SLOTS
+            .map(t => `<option value="${t}">${t}</option>`)
+            .join('');
+
+        const purposeOptions = VISIT_PURPOSES
+            .map(p => `<option value="${p}">${p}</option>`)
+            .join('');
+
         const formContainer = document.createElement('div');
         formContainer.classList.add('form-container');
         formContainer.innerHTML = `
@@ -87,14 +133,29 @@ class VisitorRegistrationForm extends HTMLElement {
                     <input type="text" id="carPlate" name="carPlate">
                 </div>
                 <div class="form-group">
-                    <label for="visitDateTime">방문 예정 일시</label>
-                    <input type="datetime-local" id="visitDateTime" name="visitDateTime" required>
+                    <label for="visitDate">방문 예정 일자</label>
+                    <input type="date" id="visitDate" name="visitDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="hostName">담당 직원 성명</label>
-                    <input type="text" id="hostName" name="hostName" required>
+                    <label for="visitTimeSlot">방문 예정 시간</label>
+                    <select id="visitTimeSlot" name="visitTimeSlot" required>
+                        <option value="" disabled selected>시간대를 선택하세요</option>
+                        ${timeSlotOptions}
+                    </select>
                 </div>
-                <button type="submit" class="submit-btn">사전 방문 신청</button>
+                <div class="form-group">
+                    <label for="visitPurpose">방문 목적</label>
+                    <select id="visitPurpose" name="visitPurpose" required>
+                        <option value="" disabled selected>방문 목적을 선택하세요</option>
+                        ${purposeOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hostInfo">담당직원 소속 및 성명</label>
+                    <input type="text" id="hostInfo" name="hostInfo"
+                           placeholder="예) 넷마블 총무팀 홍길동" required>
+                </div>
+                <button type="submit" class="submit-btn">방문 등록</button>
             </form>
         `;
 
@@ -105,23 +166,36 @@ class VisitorRegistrationForm extends HTMLElement {
     }
 
     async _handleSubmit(event) {
-        event.preventDefault(); // Prevent page reload
+        event.preventDefault();
         const form = event.target;
+        const btn = form.querySelector('.submit-btn');
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+
+        const data = {
+            visitorName:   formData.get('visitorName'),
+            company:       formData.get('company'),
+            contact:       formData.get('contact'),
+            carPlate:      formData.get('carPlate'),
+            visitDate:     formData.get('visitDate'),
+            visitTimeSlot: formData.get('visitTimeSlot'),
+            visitPurpose:  formData.get('visitPurpose'),
+            hostInfo:      formData.get('hostInfo'),
+            timestamp:     new Date(),
+        };
+
+        btn.disabled = true;
+        btn.textContent = '등록 중...';
 
         try {
-            // Add a new document with a generated ID
-            const docRef = await addDoc(collection(db, "visitRequests"), {
-                ...data,
-                timestamp: new Date() // Add a server timestamp
-            });
-            console.log("Document written with ID: ", docRef.id);
-            alert('방문 신청 정보가 Firebase에 안전하게 저장되었습니다.');
-            form.reset();
+            const docRef = await addDoc(collection(db, 'visitRequests'), data);
+            console.log('Document written with ID:', docRef.id);
+            // 완료 페이지로 이동
+            window.location.href = 'complete.html';
         } catch (e) {
-            console.error("Error adding document: ", e);
+            console.error('Error adding document:', e);
             alert('오류: 방문 신청 정보를 저장하는 데 실패했습니다. 콘솔을 확인해주세요.');
+            btn.disabled = false;
+            btn.textContent = '방문 등록';
         }
     }
 }

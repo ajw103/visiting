@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>방문 등록 완료</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    /* 상단 완료 영역 */
+    .complete-top {
+      background: #007bff;
+      color: #fff;
+      text-align: center;
+      padding: 2.5rem 2rem 2rem;
+    }
+    .check-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
+    }
+    .complete-top h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .complete-top p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    /* 찾아오시는 곳 */
+    .location-section {
+      padding: 1.75rem 2rem 0;
+    }
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #6c757d;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .address-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+    .pin-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .address-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #343a40;
+      line-height: 1.5;
+    }
+    .address-sub {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.15rem;
+    }
+
+    /* 지도 */
+    .map-wrapper {
+      width: 100%;
+      height: 280px;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .map-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* 버튼 영역 */
+    .actions {
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn-primary {
+      background: #007bff;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #0056b3; }
+    .btn-outline {
+      background: #fff;
+      color: #343a40;
+      border: 1px solid #ced4da;
+    }
+    .btn-outline:hover { background: #f8f9fa; }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.75rem 2rem; }
+      .location-section { padding: 1.5rem 1.25rem 0; }
+      .actions { padding: 1.25rem; }
+      .complete-top { padding: 2rem 1.25rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- 완료 메시지 -->
+    <div class="complete-top">
+      <div class="check-icon">✓</div>
+      <h1>방문 등록이 완료되었습니다</h1>
+      <p>담당자가 확인 후 연락드릴 수 있습니다.</p>
+    </div>
+
+    <!-- 찾아오시는 곳 -->
+    <div class="location-section">
+      <div class="section-title">찾아오시는 곳</div>
+      <div class="address-row">
+        <span class="pin-icon">📍</span>
+        <div>
+          <div class="address-text">서울 구로구 디지털로26길 38</div>
+          <div class="address-sub">지하철 2호선 구로디지털단지역 1번 출구 도보 5분</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 구글 지도 -->
+    <div class="map-wrapper">
+      <iframe
+        src="https://maps.google.com/maps?q=서울+구로구+디지털로26길+38&output=embed&hl=ko&z=16"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="찾아오시는 길">
+      </iframe>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="actions">
+      <a href="index.html" class="btn btn-primary">추가 방문 등록하기</a>
+      <a href="index.html" class="btn btn-outline">메인으로 돌아가기</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

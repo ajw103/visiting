@@ -39,6 +39,24 @@ header p {
     color: var(--secondary-color);
 }
 
+.admin-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.4rem 1rem;
+    background: transparent;
+    border: 1px solid var(--secondary-color);
+    border-radius: 20px;
+    color: var(--secondary-color);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.admin-link:hover {
+    background: var(--dark-gray);
+    color: #ffffff;
+    border-color: var(--dark-gray);
+}
+
 main {
     width: 100%;
     max-width: 600px;
