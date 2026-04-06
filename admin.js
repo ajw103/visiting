@@ -33,6 +33,32 @@ function bindEvents() {
   document.getElementById('statusFilter').addEventListener('change', applyFilter);
   document.getElementById('refreshBtn').addEventListener('click', handleRefresh);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
+  document.getElementById('visitTableBody').addEventListener('click', handleConfirmToggle);
+}
+
+async function handleConfirmToggle(e) {
+  const btn = e.target.closest('.confirm-toggle');
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  const current = btn.dataset.confirmed === 'true';
+  const next = !current;
+
+  btn.disabled = true;
+  try {
+    await updateDoc(doc(db, 'visitRequests', id), { adminConfirmed: next });
+    const visit = allVisits.find(v => v.id === id);
+    if (visit) visit.adminConfirmed = next;
+    btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
+    btn.dataset.confirmed = String(next);
+    btn.textContent = next ? '✓ 확인' : '미확인';
+    showToast(next ? '담당자 확인 처리했습니다.' : '확인을 취소했습니다.');
+  } catch (err) {
+    console.error(err);
+    showToast('업데이트 실패. 다시 시도해 주세요.', 'error');
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ──────────────────────────────────────────────
