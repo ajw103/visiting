@@ -206,6 +206,25 @@
     .status-entered { background: #fff3cd; color: #856404; }
     .status-exited  { background: #d4edda; color: #155724; }
 
+    /* 담당자 확인 토글 */
+    .confirm-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .confirm-toggle.confirmed  { background: #d4edda; color: #155724; }
+    .confirm-toggle.unconfirmed { background: #e9ecef; color: var(--gray-600); }
+    .confirm-toggle:hover.confirmed   { background: #b8dfc5; }
+    .confirm-toggle:hover.unconfirmed { background: #d1d9e0; }
+
     /* 빈 상태 */
     #emptyState {
       display: none;
