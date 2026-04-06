@@ -228,9 +228,23 @@
   searchBtn.addEventListener('click', search);
   contactInput.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
 
+  // 하이픈 제거 후 숫자만 추출
+  function digits(str) { return str.replace(/\D/g, ''); }
+
+  // 숫자 문자열 → 하이픈 포함 형식 (11자리: 010-1234-5678, 10자리: 02-1234-5678 등)
+  function addHyphens(d) {
+    if (d.length === 11) return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+    if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+    return d;
+  }
+
   async function search() {
-    const contact = contactInput.value.trim();
-    if (!contact) { contactInput.focus(); return; }
+    const raw = contactInput.value.trim();
+    if (!raw) { contactInput.focus(); return; }
+
+    const d = digits(raw);
+    // 검색할 후보 형식: 입력 그대로 + 하이픈 제거 + 하이픈 추가
+    const candidates = [...new Set([raw, d, addHyphens(d)].filter(Boolean))];
 
     searchBtn.disabled = true;
     searchBtn.textContent = '조회 중...';
@@ -238,12 +252,21 @@
     resultsSection.style.display = 'none';
 
     try {
-      const q = query(
-        collection(db, 'visitRequests'),
-        where('contact', '==', contact),
-        orderBy('timestamp', 'desc')
-      );
-      const snapshot = await getDocs(q);
+      // 각 후보로 쿼리 후 중복 제거
+      const seen = new Set();
+      const docs = [];
+      await Promise.all(candidates.map(async contact => {
+        const q = query(
+          collection(db, 'visitRequests'),
+          where('contact', '==', contact),
+          orderBy('timestamp', 'desc')
+        );
+        const snap = await getDocs(q);
+        snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); docs.push(d); } });
+      }));
+      // timestamp 내림차순 정렬
+      docs.sort((a, b) => (b.data().timestamp?.seconds ?? 0) - (a.data().timestamp?.seconds ?? 0));
+      const snapshot = { empty: docs.length === 0, docs };
 
       resultsSection.style.display = 'block';
 
