@@ -193,17 +193,20 @@ function renderTable() {
 
   tbody.innerHTML = filteredVisits.map(v => {
     const status = getStatus(v);
-    // 방문 예정: 신규(visitDate+visitTimeSlot) 또는 구버전(visitDateTime)
     const visitSchedule = v.visitDate
       ? `${v.visitDate}${v.visitTimeSlot ? '<br><small>' + esc(v.visitTimeSlot) + '</small>' : ''}`
       : formatDateTime(v.visitDateTime ? new Date(v.visitDateTime) : null);
+    const confirmed = v.adminConfirmed === true;
+    const carDisplay = Array.isArray(v.carPlates)
+      ? v.carPlates.filter(Boolean).join(', ')
+      : (v.carPlate || '-');
     return `
       <tr>
         <td>${formatDateTime(v.timestamp)}</td>
         <td>${esc(v.visitorName)}</td>
         <td>${esc(v.company) || '-'}</td>
         <td>${esc(v.contact)}</td>
-        <td>${esc(v.carPlate) || '-'}</td>
+        <td>${esc(carDisplay)}</td>
         <td>${visitSchedule}</td>
         <td>${esc(v.visitPurpose) || '-'}</td>
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
@@ -214,6 +217,12 @@ function renderTable() {
           ${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}
         </td>
         <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
+        <td>
+          <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
+                  data-id="${v.id}" data-confirmed="${confirmed}">
+            ${confirmed ? '✓ 확인' : '미확인'}
+          </button>
+        </td>
       </tr>
     `;
   }).join('');
