@@ -211,19 +211,37 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.appendChild(formContainer);
 
         this.shadowRoot.querySelector('#visitorForm').addEventListener('submit', this._handleSubmit.bind(this));
+        this.shadowRoot.querySelector('#addCarBtn').addEventListener('click', this._addCarRow.bind(this));
+    }
+
+    _addCarRow() {
+        const list = this.shadowRoot.querySelector('#carPlateList');
+        const row = document.createElement('div');
+        row.className = 'car-plate-row';
+        row.innerHTML = `
+            <input type="text" name="carPlate" placeholder="차량 번호 입력">
+            <button type="button" class="remove-car-btn" aria-label="삭제">✕</button>
+        `;
+        row.querySelector('.remove-car-btn').addEventListener('click', () => row.remove());
+        list.appendChild(row);
     }
 
     async _handleSubmit(event) {
         event.preventDefault();
         const form = event.target;
         const btn = form.querySelector('.submit-btn');
+
+        const carPlates = Array.from(this.shadowRoot.querySelectorAll('input[name="carPlate"]'))
+            .map(el => el.value.trim())
+            .filter(v => v !== '');
+
         const formData = new FormData(form);
 
         const data = {
             visitorName:   formData.get('visitorName'),
             company:       formData.get('company'),
             contact:       formData.get('contact'),
-            carPlate:      formData.get('carPlate'),
+            carPlates,
             visitDate:     formData.get('visitDate'),
             visitTimeSlot: formData.get('visitTimeSlot'),
             visitPurpose:  formData.get('visitPurpose'),
