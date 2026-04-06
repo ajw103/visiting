@@ -96,6 +96,49 @@ class VisitorRegistrationForm extends HTMLElement {
                 background-color: #ced4da;
                 cursor: not-allowed;
             }
+            .car-plate-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .car-plate-row {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            .car-plate-row input {
+                flex: 1;
+            }
+            .remove-car-btn {
+                flex-shrink: 0;
+                padding: 0.5rem 0.75rem;
+                background: none;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                color: #6c757d;
+                font-size: 1.1rem;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .remove-car-btn:hover {
+                background-color: #f8d7da;
+                border-color: #dc3545;
+                color: #dc3545;
+            }
+            .add-car-btn {
+                margin-top: 0.5rem;
+                padding: 0.5rem 1rem;
+                background: none;
+                border: 1px dashed var(--primary-color, #007bff);
+                border-radius: 4px;
+                color: var(--primary-color, #007bff);
+                font-size: 0.9rem;
+                cursor: pointer;
+                width: 100%;
+            }
+            .add-car-btn:hover {
+                background-color: #e7f1ff;
+            }
 
             @media (max-width: 480px) {
                 .form-container {
