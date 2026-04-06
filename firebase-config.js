@@ -5,12 +5,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-
 // TODO: Add your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAO7NRDyNtHXHdMRA3AqgoW63YEYtN6Bbw",
+  authDomain: "visiting-reservation.firebaseapp.com",
+  projectId: "visiting-reservation",
+  storageBucket: "visiting-reservation.firebasestorage.app",
+  messagingSenderId: "275395290510",
+  appId: "1:275395290510:web:9017ba8061164064ce70df",
+  measurementId: "G-S6XC43CBC8"
 };
 
 // Initialize Firebase
