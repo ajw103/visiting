@@ -258,8 +258,7 @@
       await Promise.all(candidates.map(async contact => {
         const q = query(
           collection(db, 'visitRequests'),
-          where('contact', '==', contact),
-          orderBy('timestamp', 'desc')
+          where('contact', '==', contact)
         );
         const snap = await getDocs(q);
         snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); docs.push(d); } });
