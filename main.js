@@ -140,6 +140,36 @@ class VisitorRegistrationForm extends HTMLElement {
                 background-color: #e7f1ff;
             }
 
+            .consent-group {
+                margin-top: 2rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid var(--light-gray, #e9ecef);
+            }
+            .consent-label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                font-weight: bold;
+                color: #212529;
+                margin-bottom: 0.2rem;
+            }
+            .consent-label input[type="checkbox"] {
+                width: 1.1rem;
+                height: 1.1rem;
+                cursor: pointer;
+            }
+            .consent-text {
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+                background-color: #f8f9fa;
+                border: 1px solid #e9ecef;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                color: #6c757d;
+                line-height: 1.5;
+            }
+
             @media (max-width: 480px) {
                 .form-container {
                     padding: 1.5rem;
@@ -202,6 +232,16 @@ class VisitorRegistrationForm extends HTMLElement {
                     <label for="hostInfo">담당직원 소속 및 성명</label>
                     <input type="text" id="hostInfo" name="hostInfo"
                            placeholder="예) 넷마블 총무팀 홍길동" required>
+                <div class="form-group consent-group">
+                    <label class="consent-label">
+                        <input type="checkbox" id="privacyConsent" name="privacyConsent" required>
+                        <span>[필수] 개인정보 수집 및 이용에 동의합니다.</span>
+                    </label>
+                    <div class="consent-text">
+                        • 수집 목적: 방문객 사전 등록 및 빌딩 출입 관리<br>
+                        • 수집 항목: 방문객 성명, 소속, 연락처, 차량번호<br>
+                        • 보유 및 이용 기간: 방문 목적 달성 시 즉시 파기
+                    </div>
                 </div>
                 <button type="submit" class="submit-btn">방문 등록</button>
             </form>
