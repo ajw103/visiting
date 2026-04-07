@@ -22,6 +22,10 @@ let filteredVisits = [];     // 검색/필터 적용 후 표시할 목록
 // 초기화
 // ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // 오늘 날짜를 기본값으로 설정
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dateFilter').value = today;
+
   updateApiStatusBadge();
   await loadVisits();
   bindEvents();
@@ -259,7 +263,8 @@ function renderTable() {
 // ──────────────────────────────────────────────
 function updateSummary() {
   const today = new Date().toISOString().split('T')[0];
-  const todayVisits = allVisits.filter(v => v.visitDateTime?.startsWith(today));
+  // 필드명을 visitDate로 변경하여 정확한 집계 유도
+  const todayVisits = allVisits.filter(v => v.visitDate === today);
 
   document.getElementById('totalCount').textContent  = allVisits.length;
   document.getElementById('todayCount').textContent  = todayVisits.length;
