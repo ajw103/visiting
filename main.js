@@ -141,9 +141,11 @@ class VisitorRegistrationForm extends HTMLElement {
             }
 
             .consent-group {
-                margin-top: 2rem;
-                padding-top: 1.5rem;
-                border-top: 1px solid var(--light-gray, #e9ecef);
+                background: #fdfdfd;
+                padding: 1rem;
+                border: 1px solid var(--light-gray, #e9ecef);
+                border-radius: 8px;
+                margin-bottom: 2rem;
             }
             .consent-label {
                 display: flex;
@@ -152,7 +154,6 @@ class VisitorRegistrationForm extends HTMLElement {
                 cursor: pointer;
                 font-weight: bold;
                 color: #212529;
-                margin-bottom: 0.2rem;
             }
             .consent-label input[type="checkbox"] {
                 width: 1.1rem;
@@ -160,7 +161,7 @@ class VisitorRegistrationForm extends HTMLElement {
                 cursor: pointer;
             }
             .consent-text {
-                margin-top: 0.5rem;
+                margin-top: 0.75rem;
                 padding: 0.75rem;
                 background-color: #f8f9fa;
                 border: 1px solid #e9ecef;
@@ -169,17 +170,57 @@ class VisitorRegistrationForm extends HTMLElement {
                 color: #6c757d;
                 line-height: 1.5;
             }
+            .section-box {
+                background: #ffffff;
+                border: 1px solid var(--light-gray, #e9ecef);
+                border-radius: 8px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            }
+            .section-title {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: var(--primary-color, #0056b3);
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #f1f3f5;
+            }
+            .time-select-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .time-select-group select {
+                flex: 1;
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 1rem;
+                background-color: #fff;
+            }
+            .time-separator {
+                font-weight: bold;
+                font-size: 1.2rem;
+                color: #495057;
+            }
 
             @media (max-width: 480px) {
                 .form-container {
                     padding: 1.5rem;
                 }
+                .section-box {
+                    padding: 1.2rem;
+                }
             }
         `;
 
-        const timeSlotOptions = TIME_SLOTS
-            .map(t => `<option value="${t}">${t}</option>`)
-            .join('');
+        const hourOptions = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0'))
+            .map(h => `<option value="${h}">${h}</option>`).join('');
+        
+        const minOptions = ['00', '10', '20', '30', '40', '50']
+            .map(m => `<option value="${m}">${m}</option>`).join('');
 
         const purposeOptions = VISIT_PURPOSES
             .map(p => `<option value="${p}">${p}</option>`)
@@ -189,61 +230,77 @@ class VisitorRegistrationForm extends HTMLElement {
         formContainer.classList.add('form-container');
         formContainer.innerHTML = `
             <form id="visitorForm">
-                <div class="form-group">
-                    <label for="visitorName">방문객 성명</label>
-                    <input type="text" id="visitorName" name="visitorName" required>
-                </div>
-                <div class="form-group">
-                    <label for="company">회사명</label>
-                    <input type="text" id="company" name="company">
-                </div>
-                <div class="form-group">
-                    <label for="contact">연락처</label>
-                    <input type="tel" id="contact" name="contact" required>
-                </div>
-                <div class="form-group" id="carPlateGroup">
-                    <label>차량 번호 (예: 12가 3456)</label>
-                    <div class="car-plate-list" id="carPlateList">
-                        <div class="car-plate-row">
-                            <input type="text" name="carPlate" placeholder="차량 번호 입력">
-                        </div>
-                    </div>
-                    <button type="button" class="add-car-btn" id="addCarBtn">+ 차량 추가</button>
-                </div>
-                <div class="form-group">
-                    <label for="visitDate">방문 예정 일자</label>
-                    <input type="date" id="visitDate" name="visitDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="visitTimeSlot">방문 예정 시간</label>
-                    <select id="visitTimeSlot" name="visitTimeSlot" required>
-                        <option value="" disabled selected>시간대를 선택하세요</option>
-                        ${timeSlotOptions}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="visitPurpose">방문 목적</label>
-                    <select id="visitPurpose" name="visitPurpose" required>
-                        <option value="" disabled selected>방문 목적을 선택하세요</option>
-                        ${purposeOptions}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="hostInfo">담당직원 소속 및 성명</label>
-                    <input type="text" id="hostInfo" name="hostInfo"
-                           placeholder="예) 넷마블 총무팀 홍길동" required>
-                <div class="form-group consent-group">
+                <div class="consent-group">
                     <label class="consent-label">
                         <input type="checkbox" id="privacyConsent" name="privacyConsent" required>
                         <span>[필수] 개인정보 수집 및 이용에 동의합니다.</span>
                     </label>
                     <div class="consent-text">
-                        • 수집 목적: 방문객 사전 등록 및 빌딩 출입 관리<br>
+                        • 수집 목적: 방문객 사전 등록 및 출입 관리<br>
                         • 수집 항목: 방문객 성명, 소속, 연락처, 차량번호<br>
                         • 보유 및 이용 기간: 방문 목적 달성 시 즉시 파기
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">방문 등록</button>
+
+                <div class="section-box">
+                    <h3 class="section-title">방문객 정보</h3>
+                    <div class="form-group">
+                        <label for="visitorName">방문객 성명</label>
+                        <input type="text" id="visitorName" name="visitorName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">소속 회사</label>
+                        <input type="text" id="company" name="company">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">연락처</label>
+                        <input type="tel" id="contact" name="contact" required>
+                    </div>
+                    <div class="form-group" id="carPlateGroup">
+                        <label>차량 번호 (예: 12가 3456)</label>
+                        <div class="car-plate-list" id="carPlateList">
+                            <div class="car-plate-row">
+                                <input type="text" name="carPlate" placeholder="차량 번호 입력">
+                            </div>
+                        </div>
+                        <button type="button" class="add-car-btn" id="addCarBtn">+ 차량 추가</button>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <h3 class="section-title">방문 정보</h3>
+                    <div class="form-group">
+                        <label for="visitDate">방문 예정 일자</label>
+                        <input type="date" id="visitDate" name="visitDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>방문 예정 시간</label>
+                        <div class="time-select-group">
+                            <select id="visitHour" required>
+                                <option value="" disabled selected>시</option>
+                                ${hourOptions}
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="visitMinute" required>
+                                <option value="" disabled selected>분</option>
+                                ${minOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="visitPurpose">방문 목적</label>
+                        <select id="visitPurpose" name="visitPurpose" required>
+                            <option value="" disabled selected>방문 목적을 선택하세요</option>
+                            ${purposeOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hostInfo">담당직원 소속 및 성명</label>
+                        <input type="text" id="hostInfo" name="hostInfo" placeholder="예) 넷마블 총무팀 홍길동" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" style="margin-top: 1rem;">방문 신청</button>
             </form>
         `;
 
@@ -276,6 +333,8 @@ class VisitorRegistrationForm extends HTMLElement {
             .filter(v => v !== '');
 
         const formData = new FormData(form);
+        const visitHour = form.querySelector('#visitHour').value;
+        const visitMinute = form.querySelector('#visitMinute').value;
 
         const data = {
             visitorName:   formData.get('visitorName'),
@@ -283,7 +342,7 @@ class VisitorRegistrationForm extends HTMLElement {
             contact:       formData.get('contact'),
             carPlates,
             visitDate:     formData.get('visitDate'),
-            visitTimeSlot: formData.get('visitTimeSlot'),
+            visitTimeSlot: `${visitHour}:${visitMinute}`,
             visitPurpose:  formData.get('visitPurpose'),
             hostInfo:      formData.get('hostInfo'),
             timestamp:     new Date(),
