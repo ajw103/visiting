@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>주차 관리자 페이지</title>
+  <title>방문객 사전 등록 관리자 페이지</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -299,9 +299,18 @@
       .main-content { padding: 1rem; }
     }
     @media (max-width: 600px) {
-      .summary-grid { grid-template-columns: repeat(2, 1fr); }
-      .admin-header { padding: 0.75rem 1rem; }
-      .header-left h1 { font-size: 1rem; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
+      .summary-card { padding: 1rem; }
+      .summary-card .value { font-size: 1.5rem; }
+      .admin-header { padding: 0.75rem; justify-content: center; text-align: center; }
+      .header-left { justify-content: center; width: 100%; margin-bottom: 0.5rem; }
+      .header-left h1 { font-size: 1.1rem; }
+      .header-right { justify-content: center; width: 100%; }
+      .header-right .btn { flex: 1; justify-content: center; padding: 0.4rem; font-size: 0.8rem; }
+      .main-content { padding: 0.75rem; }
+      .filter-bar { padding: 0.75rem; }
+      #searchInput { width: 100%; }
+      .table-header { padding: 0.8rem 1rem; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
     }
   </style>
 </head>
@@ -319,13 +328,13 @@
 <!-- 헤더 -->
 <header class="admin-header">
   <div class="header-left">
-    <h1>주차 관리자 페이지</h1>
+    <h1>방문객 사전 등록 관리자 페이지</h1>
     <span id="apiStatus" class="api-badge">확인 중...</span>
   </div>
   <div class="header-right">
     <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
     <button class="btn btn-success" id="exportBtn">↓ CSV 내보내기</button>
-    <a href="index.html" class="btn btn-outline">← 신청 페이지로</a>
+    <a href="index.html" class="btn btn-outline">← 통합 메인으로</a>
   </div>
 </header>
 
