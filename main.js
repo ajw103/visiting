@@ -351,12 +351,16 @@ class VisitorRegistrationForm extends HTMLElement {
         btn.disabled = true;
         btn.textContent = '등록 중...';
 
-        // Firebase 저장은 백그라운드에서 처리 (결과 기다리지 않음)
-        addDoc(collection(db, 'visitRequests'), data)
-            .then(docRef => console.log('Document written with ID:', docRef.id))
-            .catch(e => console.warn('Firebase 저장 실패 (설정 확인 필요):', e));
+        try {
+            // Firebase 저장이 완료될 때까지 대기
+            const docRef = await addDoc(collection(db, 'visitRequests'), data);
+            console.log('Document written with ID:', docRef.id);
+        } catch (e) {
+            console.warn('Firebase 저장 실패 (설정 확인 필요):', e);
+            alert('저장 중 오류가 발생했습니다. 파이어베이스 권한이나 인터넷을 확인해주세요.');
+        }
 
-        // Firebase 결과와 무관하게 즉시 완료 페이지로 이동
+        // 저장이 완료된 후 완료 페이지로 이동
         window.location.href = 'complete.html';
     }
 }
