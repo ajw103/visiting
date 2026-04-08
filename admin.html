@@ -277,7 +277,46 @@
     }
     .toast.error { background: var(--danger); }
 
-    /* ── 주차관제 API 안내 배너 ── */
+    /* ── Login Overlay ── */
+    #loginSection {
+      position: fixed;
+      inset: 0;
+      background: var(--gray-800);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-card {
+      background: var(--white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-card h2 { margin-bottom: 0.5rem; font-size: 1.5rem; color: var(--gray-800); }
+    .login-card p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 2rem; }
+    .login-form { text-align: left; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--gray-600); }
+    .form-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--gray-400); border-radius: 6px; font-size: 1rem; }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0,123,255,0.2); }
+    .login-btn { width: 100%; padding: 0.9rem; background: var(--primary); color: var(--white); border: none; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+    .login-btn:hover { background: var(--primary-dk); }
+    
+    /* ── Hide/Show ── */
+    .content-wrapper { display: none; }
+    .authenticated .content-wrapper { display: block; }
+    .authenticated #loginSection { display: none; }
+
+    /* ── Logout Button ── */
+    .btn-logout { background: #f8f9fa; color: #dc3545; border: 1px solid #dc3545; }
+    .btn-logout:hover { background: #dc3545; color: #fff; }
+
+    /* ── API 상태 배너 ── */
     .api-info-banner {
       background: #fff3cd;
       border: 1px solid #ffc107;
@@ -325,96 +364,118 @@
 <!-- 토스트 알림 -->
 <div id="toast" class="toast"></div>
 
-<!-- 헤더 -->
-<header class="admin-header">
-  <div class="header-left">
-    <h1>넷마블 방문예약 관리자 페이지</h1>
-    <span id="apiStatus" class="api-badge">확인 중...</span>
-  </div>
-  <div class="header-right">
-    <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
-    <button class="btn btn-success" id="exportBtn">↓ CSV 내보내기</button>
-    <a href="index.html" class="btn btn-outline">← 통합 메인으로</a>
-  </div>
-</header>
-
-<main class="main-content">
-
-  <!-- 주차관제 API 미연결 안내 배너 -->
-  <div class="api-info-banner" id="apiBanner">
-    <span>ℹ</span>
-    <div>
-      <strong>주차관제 API 미연결 상태입니다.</strong>
-      입차·출차 시간은 주차관제 업체로부터 API를 전달받은 후 <code>parking-api.js</code>에 연동하면 자동으로 표시됩니다.
+<!-- 로그인 섹션 -->
+<div id="loginSection">
+  <div class="login-card">
+    <h2>관리자 인증</h2>
+    <p>성함과 사번을 입력하여 로그인해 주세요.</p>
+    <div class="login-form">
+      <div class="form-group">
+        <label for="adminNameInput">성함</label>
+        <input type="text" id="adminNameInput" placeholder="이름 입력">
+      </div>
+      <div class="form-group">
+        <label for="adminEmpIdInput">사번 (비밀번호)</label>
+        <input type="password" id="adminEmpIdInput" placeholder="사번 입력">
+      </div>
+      <button type="button" class="login-btn" id="adminLoginBtn">로그인</button>
     </div>
   </div>
+</div>
 
-  <!-- 요약 카드 -->
-  <div class="summary-grid">
-    <div class="summary-card total">
-      <div class="label">전체 신청</div>
-      <div class="value" id="totalCount">-</div>
+<div class="content-wrapper">
+  <!-- 헤더 -->
+  <header class="admin-header">
+    <div class="header-left">
+      <h1>넷마블 방문예약 관리자 페이지</h1>
+      <span id="apiStatus" class="api-badge">확인 중...</span>
     </div>
-    <div class="summary-card today">
-      <div class="label">오늘 방문 예정</div>
-      <div class="value" id="todayCount">-</div>
+    <div class="header-right">
+      <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
+      <button class="btn btn-success" id="exportBtn">↓ CSV 내보내기</button>
+      <button class="btn btn-logout" id="logoutBtn" style="margin-left: 10px;">로그아웃</button>
+      <a href="index.html" class="btn btn-outline" style="margin-left: 5px;">← 통합 메인</a>
     </div>
-    <div class="summary-card entered">
-      <div class="label">현재 입차중</div>
-      <div class="value" id="enteredCount">-</div>
-    </div>
-    <div class="summary-card exited">
-      <div class="label">출차 완료</div>
-      <div class="value" id="exitedCount">-</div>
-    </div>
-  </div>
+  </header>
 
-  <!-- 필터 바 -->
-  <div class="filter-bar">
-    <input type="text"  id="searchInput"  placeholder="이름, 회사, 차량번호, 담당직원 검색">
-    <input type="date"  id="dateFilter"   title="방문 예정일 필터">
-    <select id="statusFilter">
-      <option value="">전체 상태</option>
-      <option value="pending">신청됨</option>
-      <option value="entered">입차중</option>
-      <option value="exited">출차완료</option>
-    </select>
-  </div>
+  <main class="main-content">
 
-  <!-- 테이블 -->
-  <div class="table-wrapper">
-    <div class="table-header">
-      <h2>방문 신청 목록</h2>
-      <span class="record-count" id="recordCount"></span>
-    </div>
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>신청일시</th>
-            <th>방문객 성명</th>
-            <th>회사명</th>
-            <th>연락처</th>
-            <th>차량번호</th>
-            <th>방문 예정 일자 / 시간</th>
-            <th>방문 목적</th>
-            <th>담당직원 소속 및 성명</th>
-            <th class="parking-group">입차 시간 ⓟ</th>
-            <th class="parking-group">출차 시간 ⓟ</th>
-            <th>상태</th>
-            <th>담당자 확인</th>
-          </tr>
-        </thead>
-        <tbody id="visitTableBody"></tbody>
-      </table>
-      <div id="emptyState">
-        <div style="font-size:2rem;">📋</div>
-        <p>표시할 방문 신청 내역이 없습니다.</p>
+    <!-- 주차관제 API 미연결 안내 배너 -->
+    <div class="api-info-banner" id="apiBanner">
+      <span>ℹ</span>
+      <div>
+        <strong>주차관제 API 미연결 상태입니다.</strong>
+        입차·출차 시간은 주차관제 업체로부터 API를 전달받은 후 <code>parking-api.js</code>에 연동하면 자동으로 표시됩니다.
       </div>
     </div>
-  </div>
 
-</main>
+    <!-- 요약 카드 -->
+    <div class="summary-grid">
+      <div class="summary-card total">
+        <div class="label">전체 신청</div>
+        <div class="value" id="totalCount">-</div>
+      </div>
+      <div class="summary-card today">
+        <div class="label">오늘 방문 예정</div>
+        <div class="value" id="todayCount">-</div>
+      </div>
+      <div class="summary-card entered">
+        <div class="label">현재 입차중</div>
+        <div class="value" id="enteredCount">-</div>
+      </div>
+      <div class="summary-card exited">
+        <div class="label">출차 완료</div>
+        <div class="value" id="exitedCount">-</div>
+      </div>
+    </div>
+
+    <!-- 필터 바 -->
+    <div class="filter-bar">
+      <input type="text"  id="searchInput"  placeholder="이름, 회사, 차량번호, 담당직원 검색">
+      <input type="date"  id="dateFilter"   title="방문 예정일 필터">
+      <select id="statusFilter">
+        <option value="">전체 상태</option>
+        <option value="pending">신청됨</option>
+        <option value="entered">입차중</option>
+        <option value="exited">출차완료</option>
+      </select>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>방문 신청 목록</h2>
+        <span class="record-count" id="recordCount"></span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>신청일시</th>
+              <th>방문객 성명</th>
+              <th>회사명</th>
+              <th>연락처</th>
+              <th>차량번호</th>
+              <th>방문 예정 일자 / 시간</th>
+              <th>방문 목적</th>
+              <th>담당직원 소속 및 성명</th>
+              <th class="parking-group">입차 시간 ⓟ</th>
+              <th class="parking-group">출차 시간 ⓟ</th>
+              <th>상태</th>
+              <th>담당자 확인</th>
+            </tr>
+          </thead>
+          <tbody id="visitTableBody"></tbody>
+        </table>
+        <div id="emptyState">
+          <div style="font-size:2rem;">📋</div>
+          <p>표시할 방문 신청 내역이 없습니다.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
