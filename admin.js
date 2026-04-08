@@ -122,11 +122,16 @@ async function handleLogin() {
 
 function handleLogout() {
     if (confirm('로그아웃 하시겠습니까?')) {
-        sessionStorage.removeItem('admin_authenticated');
-        sessionStorage.removeItem('admin_role');
-        sessionStorage.removeItem('admin_name');
-        sessionStorage.removeItem('admin_empId');
-        window.location.reload();
+        // 모든 세션 정보 삭제
+        sessionStorage.clear();
+        
+        // 입력 필드 초기화
+        document.getElementById('adminNameInput').value = '';
+        document.getElementById('adminEmpIdInput').value = '';
+        
+        // 즉시 화면 전환 및 페이지 새로고침
+        showLogin();
+        window.location.replace(window.location.pathname);
     }
 }
 
