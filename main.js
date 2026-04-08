@@ -25,6 +25,7 @@ class VisitorRegistrationForm extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+        this._selectedHostEmpId = null; // 선택된 담당자 사번 저장용
 
         const style = document.createElement('style');
         style.textContent = `
@@ -456,6 +457,7 @@ class VisitorRegistrationForm extends HTMLElement {
                 }).join('');
 
                 resultsContainer.querySelectorAll('.result-item').forEach(item => {
+                    item.addEventListener('click', () => {
                         const h = matched[item.dataset.index];
                         const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
                         // 괄호 제거 및 순서 변경: 부서 직책 성명
