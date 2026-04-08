@@ -456,11 +456,11 @@ class VisitorRegistrationForm extends HTMLElement {
                 }).join('');
 
                 resultsContainer.querySelectorAll('.result-item').forEach(item => {
-                    item.addEventListener('click', () => {
                         const h = matched[item.dataset.index];
                         const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
                         // 괄호 제거 및 순서 변경: 부서 직책 성명
                         this.shadowRoot.querySelector('#hostInfo').value = `${h.dept}${pos} ${h.name}`;
+                        this._selectedHostEmpId = h.empId; // 사번 저장
                         this._closeModal();
                     });
                 });
@@ -505,6 +505,7 @@ class VisitorRegistrationForm extends HTMLElement {
             visitTimeSlot: `${visitHour}:${visitMinute}`,
             visitPurpose:  formData.get('visitPurpose'),
             hostInfo:      formData.get('hostInfo'),
+            hostEmpId:     this._selectedHostEmpId, // 담당자 사번 정보 추가
             timestamp:     new Date(),
         };
 
