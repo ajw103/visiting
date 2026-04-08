@@ -520,6 +520,9 @@ class VisitorRegistrationForm extends HTMLElement {
             // Firebase 저장이 완료될 때까지 대기
             const docRef = await addDoc(collection(db, 'visitRequests'), data);
             console.log('Document written with ID:', docRef.id);
+
+            // 담당자에게 실시간 알림 발송 (완료 페이지 이동 전 수행)
+            await this._sendNotification(data);
         } catch (e) {
             console.warn('Firebase 저장 실패 (설정 확인 필요):', e);
             alert('저장 중 오류가 발생했습니다. 파이어베이스 권한이나 인터넷을 확인해주세요.');
@@ -527,6 +530,39 @@ class VisitorRegistrationForm extends HTMLElement {
 
         // 저장이 완료된 후 완료 페이지로 이동
         window.location.href = 'complete.html';
+    }
+
+    // 구글 앱스 스크립트(GAS)를 통한 이메일 알림 발송
+    async _sendNotification(data) {
+        if (!this._selectedHostEmail) {
+            console.warn('알림을 보낼 담당자 이메일이 없습니다.');
+            return;
+        }
+
+        const GAS_URL = 'https://script.google.com/a/macros/netmarble.com/s/AKfycbwqv9Yf1H6SjBYtJtBlNG2Jo0K2e3j3CzHqOzp__6_RXmxmJC0YMSg7uq_hUfKiFIOX/exec';
+        
+        const payload = {
+            to:      this._selectedHostEmail,
+            visitor: data.visitorName,
+            company: data.company,
+            purpose: data.visitPurpose,
+            date:    data.visitDate,
+            time:    data.visitTimeSlot
+        };
+
+        try {
+            // POST 요청 (명시적 알림 전송)
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            console.log('📬 담당자 알림 전송 시도 완료');
+        } catch (err) {
+            console.error('알림 발송 중 오류 발생:', err);
+        }
     }
 }
 
