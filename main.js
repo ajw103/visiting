@@ -523,9 +523,6 @@ class VisitorRegistrationForm extends HTMLElement {
 
             // 담당자에게 실시간 알림 발송 (완료 페이지 이동 전 수행)
             await this._sendNotification(data);
-            
-            // 디버깅을 위해 일시 정지 (로그 확인 후 확인 클릭)
-            alert('알림 전송 시도를 마쳤습니다. 콘솔(F12) 로그를 확인하신 후 확인을 눌러주세요.');
         } catch (e) {
             console.warn('Firebase 저장 실패 (설정 확인 필요):', e);
             alert('저장 중 오류가 발생했습니다.');
