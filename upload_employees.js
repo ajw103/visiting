@@ -17,11 +17,35 @@ const db = getFirestore(app);
 
 // Example data to upload
 const employees = [
-  { id: "emp001", name: "홍길동", dept: "넷마블 총무팀", email: "hong@netmarble.com", position: "팀장", phone: "010-1111-1111" },
-  { id: "emp002", name: "김철수", dept: "넷마블 인사팀", email: "kim@netmarble.com", position: "수석", phone: "010-2222-2222" },
-  { id: "emp003", name: "이영희", dept: "넷마블 개발본부", email: "lee@netmarble.com", position: "팀원", phone: "010-3333-3333" },
-  { id: "emp004", name: "박민준", dept: "넷마블 마케팅실", email: "park@netmarble.com", position: "팀장", phone: "010-4444-4444" },
-  { id: "emp005", name: "최서연", dept: "넷마블 재무팀", email: "choi@netmarble.com", position: "팀원", phone: "010-5555-5555" }
+{name: "김우일", dept: "총무실", email: "woo1woo1@netmarble.com", position: "실장", phone: "010-3194-6568" },
+{name: "김용태", dept: "총무실", email: "kyt5612@netmarble.com", position: "팀원", phone: "010-4442-3005" },
+{name: "김성진", dept: "총무실", email: "netthru@netmarble.com", position: "팀원", phone: "010-3322-7891" },
+{name: "김민혁", dept: "총무실", email: "illinois1215@netmarble.com", position: "팀원", phone: "010-4751-8309" },
+{name: "김재성", dept: "구매팀", email: "jake.kim@netmarble.com", position: "팀장", phone: "010-8553-3292" },
+{name: "장승영", dept: "구매팀", email: "ricewater85@netmarble.com", position: "팀원", phone: "010-6642-8831" },
+{name: "박영신", dept: "구매팀", email: "yspark@netmarble.com", position: "팀원", phone: "010-2621-2992" },
+{name: "선병훈", dept: "구매팀", email: "shygood@netmarble.com", position: "팀원", phone: "010-8620-8704" },
+{name: "김정한", dept: "구매팀", email: "junghan_kim@netmarble.com", position: "팀원", phone: "010-3430-1452" },
+{name: "김민규", dept: "구매팀", email: "minq@netmarble.com", position: "팀원", phone: "010-9736-1789" },
+{name: "정의훈", dept: "구매팀", email: "uihoon_jeong@netmarble.com", position: "팀원", phone: "010-9415-3681" },
+{name: "박태순", dept: "안전환경보건팀", email: "mark01@netmarble.com", position: "팀장", phone: "010-3461-4603" },
+{name: "이혜경", dept: "안전환경보건팀", email: "hk88love@netmarble.com", position: "팀원", phone: "010-6773-8579" },
+{name: "김종혁", dept: "안전환경보건팀", email: "jonghyuk.kim@netmarble.com", position: "팀원", phone: "010-4802-8390" },
+{name: "이예림", dept: "안전환경보건팀", email: "yelim0116@netmarble.com", position: "팀원", phone: "010-2396-8569" },
+{name: "황서현", dept: "안전환경보건팀", email: "standhyun@netmarble.com", position: "팀원", phone: "010-8519-5192" },
+{name: "이문재", dept: "총무팀", email: "sixmj@netmarble.com", position: "팀장", phone: "010-8300-3598" },
+{name: "이창환", dept: "총무팀", email: "haeboy7235@netmarble.com", position: "팀원", phone: "010-9395-3355" },
+{name: "이민규", dept: "총무팀", email: "andu0401@netmarble.com", position: "팀원", phone: "010-3886-3696" },
+{name: "박슬기", dept: "총무팀", email: "psg@netmarble.com", position: "팀원", phone: "010-2799-4736" },
+{name: "김은솔", dept: "총무팀", email: "elly@netmarble.com", position: "팀원", phone: "010-8139-0903" },
+{name: "최재훈", dept: "총무팀", email: "cjaeh90@netmarble.com", position: "팀원", phone: "010-9052-0344" },
+{name: "조철희", dept: "총무팀", email: "choch@netmarble.com", position: "팀원", phone: "010-2755-3462" },
+{name: "신대형", dept: "총무팀", email: "emg56@netmarble.com", position: "팀원", phone: "010-5811-8552" },
+{name: "안재우", dept: "총무팀", email: "ajw103@netmarble.com", position: "팀원", phone: "010-5674-5812" },
+{name: "조영균", dept: "총무팀", email: "evancho@netmarble.com", position: "팀원", phone: "010-2232-7685" },
+{name: "조성철", dept: "총무팀", email: "jo8810@netmarble.com", position: "팀원", phone: "010-3916-8810" },
+{name: "양우선", dept: "총무팀", email: "jd134218@netmarble.com", position: "팀원", phone: "010-5132-2016" },
+{name: "김승연", dept: "총무팀", email: "syryan@netmarble.com", position: "팀원", phone: "010-5769-1837" },
 ];
 
 async function uploadData() {
