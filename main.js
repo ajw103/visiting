@@ -429,28 +429,13 @@ class VisitorRegistrationForm extends HTMLElement {
 
         resultsContainer.innerHTML = '<div class="no-result">검색 중...</div>';
 
-        try {
-            // Firestore에서 'name'이 정확히 일치하는 임직원 검색
-            const q = query(
-                collection(db, 'employees'),
-                where('name', '==', queryStr)
-            );
-            const querySnapshot = await getDocs(q);
-            const matched = [];
-            querySnapshot.forEach((doc) => {
-                matched.push({ id: doc.id, ...doc.data() });
-            });
-
-            if (matched.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.<br>성명을 정확히 입력했는지 확인하세요.</div>';
-            } else {
                 resultsContainer.innerHTML = matched.map((h, i) => {
                     // 직책이 '팀원'인 경우 노출하지 않음
                     const positionDisplay = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
                     return `
                         <div class="result-item" data-index="${i}">
-                            <span class="result-dept">${h.dept}</span>
-                            <span class="result-name">${h.name}${positionDisplay}</span>
+                            <span class="result-dept">${h.dept}${positionDisplay}</span>
+                            <span class="result-name">${h.name}</span>
                         </div>
                     `;
                 }).join('');
@@ -459,11 +444,11 @@ class VisitorRegistrationForm extends HTMLElement {
                     item.addEventListener('click', () => {
                         const h = matched[item.dataset.index];
                         const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
-                        this.shadowRoot.querySelector('#hostInfo').value = `(${h.dept}) ${h.name}${pos}`;
+                        // 괄호 제거 및 순서 변경: 부서 직책 성명
+                        this.shadowRoot.querySelector('#hostInfo').value = `${h.dept}${pos} ${h.name}`;
                         this._closeModal();
                     });
                 });
-            }
         } catch (e) {
             console.error('Firestore 검색 오류:', e);
             resultsContainer.innerHTML = '<div class="no-result">검색 중 오류가 발생했습니다.</div>';
