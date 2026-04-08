@@ -214,6 +214,58 @@ class VisitorRegistrationForm extends HTMLElement {
                     padding: 1.2rem;
                 }
             }
+
+            /* 검색 모달 스타일 */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-overlay.show { display: flex; }
+            .modal-content {
+                background: white;
+                width: 90%;
+                max-width: 400px;
+                padding: 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.2rem;
+            }
+            .modal-header h3 { margin: 0; font-size: 1.2rem; color: #333; }
+            .close-modal {
+                background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999;
+            }
+            .search-box {
+                display: flex; gap: 0.5rem; margin-bottom: 1rem;
+            }
+            .search-box input {
+                flex: 1; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px;
+            }
+            .search-btn {
+                padding: 0.7rem 1rem; background: var(--primary-color, #007bff); color: white; border: none; border-radius: 6px; cursor: pointer;
+            }
+            .search-results {
+                max-height: 200px; overflow-y: auto;
+                border: 1px solid #eee; border-radius: 6px;
+            }
+            .result-item {
+                padding: 0.8rem; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s;
+            }
+            .result-item:hover { background: #f8f9fa; }
+            .result-item:last-child { border-bottom: none; }
+            .result-dept { font-size: 0.8rem; color: #666; display: block; }
+            .result-name { font-weight: bold; color: #333; }
+            .no-result { padding: 1.5rem; text-align: center; color: #999; font-size: 0.9rem; }
         `;
 
         const hourOptions = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0'))
@@ -302,6 +354,23 @@ class VisitorRegistrationForm extends HTMLElement {
 
                 <button type="submit" class="submit-btn" style="margin-top: 1rem;">방문 신청</button>
             </form>
+
+            <!-- 직원 검색 모달 -->
+            <div id="hostModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>담당 직원 검색</h3>
+                        <button type="button" class="close-modal" id="closeModal">&times;</button>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="hostSearchInput" placeholder="직원 성명을 정확히 입력하세요">
+                        <button type="button" class="search-btn" id="hostSearchBtn">검색</button>
+                    </div>
+                    <div class="search-results" id="hostSearchResults">
+                        <div class="no-result">성명을 입력하고 검색 버튼을 누르세요.</div>
+                    </div>
+                </div>
+            </div>
         `;
 
         this.shadowRoot.appendChild(style);
@@ -309,6 +378,74 @@ class VisitorRegistrationForm extends HTMLElement {
 
         this.shadowRoot.querySelector('#visitorForm').addEventListener('submit', this._handleSubmit.bind(this));
         this.shadowRoot.querySelector('#addCarBtn').addEventListener('click', this._addCarRow.bind(this));
+
+        // 검색 모달 관련 이벤트 리스너
+        this.shadowRoot.querySelector('#hostInfo').addEventListener('click', () => this._openModal());
+        this.shadowRoot.querySelector('#hostInfo').addEventListener('focus', (e) => { e.target.blur(); this._openModal(); }); // 포커스 시에도 모달 오픈
+        this.shadowRoot.querySelector('#closeModal').addEventListener('click', () => this._closeModal());
+        this.shadowRoot.querySelector('#hostSearchBtn').addEventListener('click', () => this._searchHost());
+        this.shadowRoot.querySelector('#hostSearchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); this._searchHost(); }
+        });
+        this.shadowRoot.querySelector('#hostModal').addEventListener('click', (e) => {
+            if (e.target.id === 'hostModal') this._closeModal();
+        });
+
+        // 직원 데이터 로드
+        this._hosts = [];
+        this._loadHosts();
+    }
+
+    async _loadHosts() {
+        try {
+            const resp = await fetch('hosts.json');
+            this._hosts = await resp.json();
+        } catch (e) {
+            console.error('Failed to load hosts.json:', e);
+        }
+    }
+
+    _openModal() {
+        this.shadowRoot.querySelector('#hostModal').classList.add('show');
+        this.shadowRoot.querySelector('#hostSearchInput').value = '';
+        this.shadowRoot.querySelector('#hostSearchResults').innerHTML = '<div class="no-result">성명을 입력하고 검색 버튼을 누르세요.</div>';
+        setTimeout(() => this.shadowRoot.querySelector('#hostSearchInput').focus(), 100);
+    }
+
+    _closeModal() {
+        this.shadowRoot.querySelector('#hostModal').classList.remove('show');
+    }
+
+    _searchHost() {
+        const query = this.shadowRoot.querySelector('#hostSearchInput').value.trim();
+        const resultsContainer = this.shadowRoot.querySelector('#hostSearchResults');
+        
+        if (!query) {
+            resultsContainer.innerHTML = '<div class="no-result">성명을 입력해 주세요.</div>';
+            return;
+        }
+
+        // 정확히 일치하는 성명만 필터링 (사용자 요청 반영)
+        const matched = this._hosts.filter(h => h.name === query);
+
+        if (matched.length === 0) {
+            resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.<br>성명을 정확히 입력했는지 확인하세요.</div>';
+        } else {
+            resultsContainer.innerHTML = matched.map((h, i) => `
+                <div class="result-item" data-index="${i}">
+                    <span class="result-dept">${h.dept}</span>
+                    <span class="result-name">${h.name}</span>
+                </div>
+            `).join('');
+
+            resultsContainer.querySelectorAll('.result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const h = matched[item.dataset.index];
+                    this.shadowRoot.querySelector('#hostInfo').value = `(${h.dept}) ${h.name}`;
+                    this._closeModal();
+                });
+            });
+        }
     }
 
     _addCarRow() {
