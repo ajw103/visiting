@@ -551,15 +551,15 @@ class VisitorRegistrationForm extends HTMLElement {
         };
 
         try {
-            // POST 요청 (명시적 알림 전송)
+            // mode: 'no-cors' 환경에서 안전하게 전달하기 위해 text/plain 방식 사용
             await fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', // CORS 정책 우회
                 cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain' }, // 구글 서버와의 범용적 통신을 위해 변경
                 body: JSON.stringify(payload)
             });
-            console.log('📬 담당자 알림 전송 시도 완료');
+            console.log('📬 담당자 알림 전송 시도 완료 (No-CORS Mode)');
         } catch (err) {
             console.error('알림 발송 중 오류 발생:', err);
         }
