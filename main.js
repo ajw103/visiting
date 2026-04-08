@@ -26,6 +26,7 @@ class VisitorRegistrationForm extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this._selectedHostEmpId = null; // 선택된 담당자 사번 저장용
+        this._selectedHostEmail = null; // 선택된 담당자 이메일 저장용
 
         const style = document.createElement('style');
         style.textContent = `
@@ -463,6 +464,7 @@ class VisitorRegistrationForm extends HTMLElement {
                         // 괄호 제거 및 순서 변경: 부서 직책 성명
                         this.shadowRoot.querySelector('#hostInfo').value = `${h.dept}${pos} ${h.name}`;
                         this._selectedHostEmpId = h.empId; // 사번 저장
+                        this._selectedHostEmail = h.email; // 이메일 저장
                         this._closeModal();
                     });
                 });
