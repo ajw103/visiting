@@ -184,10 +184,13 @@ function updateApiStatusBadge() {
 async function loadVisits() {
   setLoading(true);
   try {
+    const role = sessionStorage.getItem('admin_role');
+    const myEmpId = sessionStorage.getItem('admin_empId');
+
     const q = query(collection(db, 'visitRequests'), orderBy('timestamp', 'desc'));
     const snapshot = await getDocs(q);
 
-    allVisits = snapshot.docs.map(d => {
+    const rawData = snapshot.docs.map(d => {
       const raw = d.data();
       return {
         id: d.id,
@@ -200,6 +203,20 @@ async function loadVisits() {
         visitDate: raw.visitDate ?? raw.visitDateTime?.split('T')[0] ?? null,
       };
     });
+
+    // 권한별 필터링
+    if (role === 'super') {
+        // 총관리자는 모든 데이터 확인 가능
+        allVisits = rawData;
+    } else {
+        // 일반 담당자는 본인의 사번(hostEmpId)과 일치하거나, 구버전 데이터 중 본인 이름이 포함된 건만 확인 가능
+        const myName = sessionStorage.getItem('admin_name');
+        allVisits = rawData.filter(v => {
+            const matchEmpId = v.hostEmpId && myEmpId && v.hostEmpId.toUpperCase() === myEmpId.toUpperCase();
+            const matchName = v.hostInfo && v.hostInfo.includes(myName); // 구버전 대응
+            return matchEmpId || matchName;
+        });
+    }
 
     // 주차관제 API가 연결된 경우 입출차 데이터 동기화
     if (IS_API_CONNECTED) {
