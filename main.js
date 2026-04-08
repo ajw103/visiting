@@ -521,8 +521,8 @@ class VisitorRegistrationForm extends HTMLElement {
             const docRef = await addDoc(collection(db, 'visitRequests'), data);
             console.log('Document written with ID:', docRef.id);
 
-            // 담당자에게 실시간 알림 발송 (완료 페이지 이동 전 수행)
-            await this._sendNotification(data);
+            // 담당자에게 실시간 알림 발송 (페이지 이동과 병렬로 처리)
+            this._sendNotification(data);
         } catch (e) {
             console.warn('Firebase 저장 실패 (설정 확인 필요):', e);
             alert('저장 중 오류가 발생했습니다.');
@@ -553,11 +553,12 @@ class VisitorRegistrationForm extends HTMLElement {
         try {
             console.log('📡 알림 전송 시작:', payload);
             
-            // mode: 'no-cors' 환경에서 안전하게 전달하기 위해 text/plain 방식 사용
-            const response = await fetch(GAS_URL, {
+            // mode: 'no-cors' 환경에서 안전하게 전달하며, 페이지 이동 후에도 전송을 보장(keepalive)
+            await fetch(GAS_URL, {
                 method: 'POST',
                 mode: 'no-cors', // CORS 정책 우회
                 cache: 'no-cache',
+                keepalive: true, // 페이지 이동 후에도 요청이 취소되지 않도록 보장
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload)
             });
