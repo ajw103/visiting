@@ -59,35 +59,57 @@ async function showDashboard() {
 
 async function handleLogin() {
     const name = document.getElementById('adminNameInput').value.trim();
-    const empId = document.getElementById('adminEmpIdInput').value.trim();
+    const password = document.getElementById('adminEmpIdInput').value.trim();
     const loginBtn = document.getElementById('adminLoginBtn');
 
-    if (!name || !empId) {
-        alert('성함과 사번을 모두 입력해 주세요.');
+    if (!name || !password) {
+        alert('성함과 비밀번호(사번)를 모두 입력해 주세요.');
         return;
     }
 
+    // 1. 총관리자 체크
+    if (name === 'admin' && password === 'netmarble1!') {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_role', 'super');
+        sessionStorage.setItem('admin_name', '총관리자');
+        showToast(`총관리자님, 환영합니다.`);
+        showDashboard();
+        return;
+    }
+
+    // 2. 일반 담당자 체크 (사번 대소문자 미구분)
     loginBtn.disabled = true;
     loginBtn.textContent = '인증 중...';
 
     try {
-        // Firestore에서 성함과 사번이 모두 일치하는 임직원 검색
+        // 이름으로 먼저 검색
         const q = query(
             collection(db, 'employees'),
-            where('name', '==', name),
-            where('empId', '==', empId)
+            where('name', '==', name)
         );
         const snap = await getDocs(q);
 
-        if (!snap.empty) {
-            // 인증 성공
+        let authenticated = false;
+        let empData = null;
+
+        snap.forEach(doc => {
+            const data = doc.data();
+            // 사번 비교 시 양쪽 모두 대문자로 변환하여 대소문자 미구분 처리
+            if (data.empId && data.empId.toUpperCase() === password.toUpperCase()) {
+                authenticated = true;
+                empData = data;
+            }
+        });
+
+        if (authenticated) {
             sessionStorage.setItem('admin_authenticated', 'true');
+            sessionStorage.setItem('admin_role', 'staff');
             sessionStorage.setItem('admin_name', name);
-            showToast(`${name} 관리자님, 환영합니다.`);
+            sessionStorage.setItem('admin_empId', empData.empId);
+            showToast(`${name} 담당자님, 환영합니다.`);
             showDashboard();
         } else {
-            // 인증 실패
-            alert('인증에 실패했습니다. 성함과 사명을 다시 확인해 주세요.');
+            alert('인증에 실패했습니다. 성함과 사번을 다시 확인해 주세요.');
         }
     } catch (err) {
         console.error('Login Error:', err);
@@ -101,7 +123,9 @@ async function handleLogin() {
 function handleLogout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         sessionStorage.removeItem('admin_authenticated');
+        sessionStorage.removeItem('admin_role');
         sessionStorage.removeItem('admin_name');
+        sessionStorage.removeItem('admin_empId');
         window.location.reload();
     }
 }
