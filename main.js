@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
 const TIME_SLOTS = [
     '09:00 ~ 10:00',
@@ -15,10 +15,9 @@ const TIME_SLOTS = [
 ];
 
 const VISIT_PURPOSES = [
-    '비즈니스 미팅',
-    '업무 협의',
-    '계약 및 서류 처리',
-    '시설 견학',
+    '회의',
+    '면접',
+    '정기점검',
     '기타 방문',
 ];
 
@@ -215,6 +214,17 @@ class VisitorRegistrationForm extends HTMLElement {
                 }
             }
 
+            .datetime-row {
+                display: flex;
+                gap: 1rem;
+                align-items: flex-end;
+            }
+            .datetime-row > .form-group {
+                margin-bottom: 0;
+            }
+            .date-field { flex: 2; }
+            .time-field { flex: 3; }
+
             /* 검색 모달 스타일 */
             .modal-overlay {
                 display: none;
@@ -321,22 +331,24 @@ class VisitorRegistrationForm extends HTMLElement {
 
                 <div class="section-box">
                     <h3 class="section-title">방문 정보</h3>
-                    <div class="form-group">
-                        <label for="visitDate">방문 예정 일자</label>
-                        <input type="date" id="visitDate" name="visitDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>방문 예정 시간</label>
-                        <div class="time-select-group">
-                            <select id="visitHour" required>
-                                <option value="" disabled selected>시</option>
-                                ${hourOptions}
-                            </select>
-                            <span class="time-separator">:</span>
-                            <select id="visitMinute" required>
-                                <option value="" disabled selected>분</option>
-                                ${minOptions}
-                            </select>
+                    <div class="datetime-row" style="margin-bottom: 1.5rem;">
+                        <div class="form-group date-field">
+                            <label for="visitDate">방문 예정 일자</label>
+                            <input type="date" id="visitDate" name="visitDate" required>
+                        </div>
+                        <div class="form-group time-field">
+                            <label>방문 예정 시간</label>
+                            <div class="time-select-group">
+                                <select id="visitHour" required>
+                                    <option value="" disabled selected>시</option>
+                                    ${hourOptions}
+                                </select>
+                                <span class="time-separator">:</span>
+                                <select id="visitMinute" required>
+                                    <option value="" disabled selected>분</option>
+                                    ${minOptions}
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -347,8 +359,8 @@ class VisitorRegistrationForm extends HTMLElement {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="hostInfo">담당직원 소속 및 성명</label>
-                        <input type="text" id="hostInfo" name="hostInfo" placeholder="예) 넷마블 총무팀 홍길동" required>
+                        <label for="hostInfo">담당직원</label>
+                        <input type="text" id="hostInfo" name="hostInfo" placeholder="*담당 직원의 성함을 입력해 주세요" required readonly>
                     </div>
                 </div>
 
@@ -391,18 +403,8 @@ class VisitorRegistrationForm extends HTMLElement {
             if (e.target.id === 'hostModal') this._closeModal();
         });
 
-        // 직원 데이터 로드
+        // 직원 데이터 로드 (이제 Firestore 실시간 쿼리를 사용하므로 초기 로드는 필요 없음)
         this._hosts = [];
-        this._loadHosts();
-    }
-
-    async _loadHosts() {
-        try {
-            const resp = await fetch('hosts.json');
-            this._hosts = await resp.json();
-        } catch (e) {
-            console.error('Failed to load hosts.json:', e);
-        }
     }
 
     _openModal() {
@@ -416,35 +418,55 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.querySelector('#hostModal').classList.remove('show');
     }
 
-    _searchHost() {
-        const query = this.shadowRoot.querySelector('#hostSearchInput').value.trim();
+    async _searchHost() {
+        const queryStr = this.shadowRoot.querySelector('#hostSearchInput').value.trim();
         const resultsContainer = this.shadowRoot.querySelector('#hostSearchResults');
         
-        if (!query) {
+        if (!queryStr) {
             resultsContainer.innerHTML = '<div class="no-result">성명을 입력해 주세요.</div>';
             return;
         }
 
-        // 정확히 일치하는 성명만 필터링 (사용자 요청 반영)
-        const matched = this._hosts.filter(h => h.name === query);
+        resultsContainer.innerHTML = '<div class="no-result">검색 중...</div>';
 
-        if (matched.length === 0) {
-            resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.<br>성명을 정확히 입력했는지 확인하세요.</div>';
-        } else {
-            resultsContainer.innerHTML = matched.map((h, i) => `
-                <div class="result-item" data-index="${i}">
-                    <span class="result-dept">${h.dept}</span>
-                    <span class="result-name">${h.name}</span>
-                </div>
-            `).join('');
-
-            resultsContainer.querySelectorAll('.result-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const h = matched[item.dataset.index];
-                    this.shadowRoot.querySelector('#hostInfo').value = `(${h.dept}) ${h.name}`;
-                    this._closeModal();
-                });
+        try {
+            // Firestore에서 'name'이 정확히 일치하는 임직원 검색
+            const q = query(
+                collection(db, 'employees'),
+                where('name', '==', queryStr)
+            );
+            const querySnapshot = await getDocs(q);
+            const matched = [];
+            querySnapshot.forEach((doc) => {
+                matched.push({ id: doc.id, ...doc.data() });
             });
+
+            if (matched.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.<br>성명을 정확히 입력했는지 확인하세요.</div>';
+            } else {
+                resultsContainer.innerHTML = matched.map((h, i) => {
+                    // 직책이 '팀원'인 경우 노출하지 않음
+                    const positionDisplay = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
+                    return `
+                        <div class="result-item" data-index="${i}">
+                            <span class="result-dept">${h.dept}</span>
+                            <span class="result-name">${h.name}${positionDisplay}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                resultsContainer.querySelectorAll('.result-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const h = matched[item.dataset.index];
+                        const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
+                        this.shadowRoot.querySelector('#hostInfo').value = `(${h.dept}) ${h.name}${pos}`;
+                        this._closeModal();
+                    });
+                });
+            }
+        } catch (e) {
+            console.error('Firestore 검색 오류:', e);
+            resultsContainer.innerHTML = '<div class="no-result">검색 중 오류가 발생했습니다.</div>';
         }
     }
 
