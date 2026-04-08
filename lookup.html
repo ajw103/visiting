@@ -274,7 +274,18 @@
         return;
       }
 
-      resultsList.innerHTML = snapshot.docs.map(d => {
+      const today = new Date().toISOString().split('T')[0];
+      const futureDocs = snapshot.docs.filter(d => {
+        const v = d.data();
+        return (v.visitDate ?? '') >= today;
+      });
+
+      if (futureDocs.length === 0) {
+        resultsList.innerHTML = '<div class="result-empty">오늘 이후의 예약 내역이 없습니다.</div>';
+        return;
+      }
+
+      resultsList.innerHTML = futureDocs.map(d => {
         const v = d.data();
         const confirmed = v.adminConfirmed === true;
 
@@ -295,7 +306,7 @@
                 ${v.company ? `<div class="visitor-company">${esc(v.company)}</div>` : ''}
               </div>
               <span class="confirm-badge ${confirmed ? 'confirmed' : 'unconfirmed'}">
-                ${confirmed ? '✓ 담당자 확인' : '미확인'}
+                ${confirmed ? '담당자 확인' : '담당자 확인전'}
               </span>
             </div>
             <div class="result-detail">
