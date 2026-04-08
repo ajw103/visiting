@@ -542,7 +542,7 @@ class VisitorRegistrationForm extends HTMLElement {
             return;
         }
 
-        const GAS_URL = 'https://script.google.com/a/macros/netmarble.com/s/AKfycbwqv9Yf1H6SjBYtJtBlNG2Jo0K2e3j3CzHqOzp__6_RXmxmJC0YMSg7uq_hUfKiFIOX/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
         
         const payload = {
             to:      this._selectedHostEmail,
