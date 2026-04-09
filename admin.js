@@ -468,7 +468,13 @@ function renderTable() {
       : (v.carPlate || '-');
     return `
       <tr>
-        <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
+        <td>
+          <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
+                  data-id="${v.id}" data-confirmed="${confirmed}">
+            ${confirmed ? '승인 완료' : '방문 승인하기'}
+          </button>
+          ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
+        </td>
         <td class="visitor-info-cell">
           <div class="v-name">${esc(v.visitorName)}</div>
           ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
@@ -482,16 +488,10 @@ function renderTable() {
         </td>
         <td>${visitSchedule}</td>
         <td>${esc(v.visitPurpose) || '-'}</td>
-        <td>${esc(v.contact)}</td>
-        <td>
-          <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
-                  data-id="${v.id}" data-confirmed="${confirmed}">
-            ${confirmed ? '승인 완료' : '방문 승인하기'}
-          </button>
-          ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
-        </td>
-        <td>${esc(v.company) || '-'}</td>
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
+        <td>${esc(v.contact)}</td>
+        <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
+        <td>${esc(v.company) || '-'}</td>
         <td>${formatDateTime(v.timestamp)}</td>
       </tr>
     `;
