@@ -665,9 +665,13 @@ function setLoading(on) {
   document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
 }
 
-function showToast(message, type = 'success') {
+function showToast(message, type = 'success', actionUrl = null, actionLabel = null) {
   const toast = document.getElementById('toast');
-  toast.textContent = message;
+  if (actionUrl && actionLabel) {
+    toast.innerHTML = `${message} <a href="${actionUrl}" target="_blank" class="toast-action">${actionLabel}</a>`;
+  } else {
+    toast.textContent = message;
+  }
   toast.className = `toast show ${type}`;
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  setTimeout(() => toast.classList.remove('show'), actionUrl ? 6000 : 3000);
 }
