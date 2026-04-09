@@ -195,7 +195,11 @@ async function handleConfirmToggle(e) {
     btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
     btn.dataset.confirmed = String(next);
     btn.textContent = next ? '승인 완료' : '방문 승인하기';
-    showToast(next ? '방문 승인 처리했습니다.' : '승인을 취소했습니다.');
+    if (next) {
+      showToast('방문 승인 처리했습니다.', 'success', 'https://gapps.nmn.io/', '회의실 예약 →');
+    } else {
+      showToast('승인을 취소했습니다.');
+    }
 
     // 승인 처리 시 방문객에게 알림 발송
     if (next === true && visit?.visitorEmail) {
