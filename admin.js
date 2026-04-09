@@ -46,7 +46,9 @@ function showLogin() {
 }
 
 async function showDashboard() {
+  const role = sessionStorage.getItem('admin_role') || 'staff';
   document.body.classList.add('authenticated');
+  document.body.classList.add(`role-${role}`); // 역할별 클래스 추가 (UI 제어용)
   
   // 오늘 날짜를 기본값으로 설정
   const today = new Date().toISOString().split('T')[0];
@@ -150,6 +152,12 @@ async function handleConfirmToggle(e) {
 
   const id = btn.dataset.id;
   const current = btn.dataset.confirmed === 'true';
+
+  // 이미 확인된 건을 다시 누를 때(취소 시도)만 컨펌창 표시
+  if (current) {
+    if (!confirm('방문 예약을 취소하시겠습니까?')) return;
+  }
+
   const next = !current;
 
   btn.disabled = true;
