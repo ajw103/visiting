@@ -95,35 +95,48 @@
     /* ── Summary Cards ── */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      grid-template-columns: 1.5fr 1fr; /* 오늘을 더 크게 */
+      gap: 1.25rem;
+      margin-bottom: 2rem;
     }
     .summary-card {
-      background: var(--white);
-      border-radius: 10px;
-      padding: 1.25rem 1.5rem;
-      box-shadow: var(--shadow);
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .summary-card .label { font-size: 0.8rem; color: var(--gray-600); margin-bottom: 0.4rem; }
-    .summary-card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
-    .summary-card.total   .value { color: var(--primary); }
-    .summary-card.today   .value { color: #6f42c1; }
-    .summary-card.entered .value { color: var(--warning); }
-    .summary-card.exited  .value { color: var(--success); }
+    .summary-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+    .summary-card .label { font-size: 0.95rem; color: var(--gray-600); margin-bottom: 0.5rem; font-weight: 500; }
+    .summary-card .value { font-size: 2.25rem; font-weight: 800; color: var(--primary); }
+    .summary-card.today .value { color: #007bff; }
+    .summary-card.month .value { font-size: 1.75rem; color: var(--gray-700); }
+
+    /* 일반 담당자(role-staff) 전용 UI 최적화 */
+    .role-staff .summary-card.entered, .role-staff .summary-card.exited { display: none; }
 
     /* ── Filter Bar ── */
     .filter-bar {
       background: var(--white);
       border-radius: 10px;
-      padding: 1rem 1.25rem;
+      padding: 1.25rem;
       box-shadow: var(--shadow);
       display: flex;
       gap: 0.75rem;
       align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
+    .filter-group input {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #0056b3; }
     .filter-bar input,
     .filter-bar select {
       padding: 0.5rem 0.75rem;
