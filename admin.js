@@ -219,17 +219,18 @@ async function loadVisits() {
 
     // 권한별 필터링
     if (role === 'super') {
-        // 총관리자는 모든 데이터 확인 가능
         allVisits = rawData;
     } else {
-        // 일반 담당자는 본인의 사번(hostEmpId)과 일치하거나, 구버전 데이터 중 본인 이름이 포함된 건만 확인 가능
         const myName = sessionStorage.getItem('admin_name');
         allVisits = rawData.filter(v => {
             const matchEmpId = v.hostEmpId && myEmpId && v.hostEmpId.toUpperCase() === myEmpId.toUpperCase();
-            const matchName = v.hostInfo && v.hostInfo.includes(myName); // 구버전 대응
+            const matchName = v.hostInfo && v.hostInfo.includes(myName);
             return matchEmpId || matchName;
         });
     }
+
+    // 최신순 정렬 (이미 쿼리에 orderBy가 있지만, 혹시 모를 로컬 데이터 동기화를 위해 보장)
+    allVisits.sort((a, b) => (b.timestamp?.getTime() || 0) - (a.timestamp?.getTime() || 0));
 
     // 주차관제 API가 연결된 경우 입출차 데이터 동기화
     if (IS_API_CONNECTED) {
@@ -395,11 +396,12 @@ function renderTable() {
 // ──────────────────────────────────────────────
 function updateSummary() {
   const now = new Date();
+  const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // KST 기준 보정 (필요시)
   const todayStr = now.toISOString().split('T')[0];
-  const currentMonthPrefix = todayStr.substring(0, 7); // YYYY-MM
+  const monthPrefix = todayStr.substring(0, 7); // YYYY-MM
 
   const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
-  const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(currentMonthPrefix));
+  const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(monthPrefix));
 
   const todayCountEl = document.getElementById('todayCount');
   const monthCountEl = document.getElementById('monthCount');
