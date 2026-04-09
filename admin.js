@@ -195,11 +195,21 @@ async function handleConfirmToggle(e) {
     btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
     btn.dataset.confirmed = String(next);
     btn.textContent = next ? '승인 완료' : '방문 승인하기';
+
+    // 승인 완료 시 회의실 예약 버튼 추가, 취소 시 제거
+    const cell = btn.closest('td');
+    const existingLink = cell.querySelector('.room-booking-btn');
+    if (existingLink) existingLink.remove();
     if (next) {
-      showToast('방문 승인 처리했습니다.', 'success', 'https://gapps.nmn.io/', '회의실 예약 →');
-    } else {
-      showToast('승인을 취소했습니다.');
+      const link = document.createElement('a');
+      link.href = 'https://gapps.nmn.io/';
+      link.target = '_blank';
+      link.className = 'room-booking-btn';
+      link.textContent = '회의실 예약 →';
+      cell.appendChild(link);
     }
+
+    showToast(next ? '방문 승인 처리했습니다.' : '승인을 취소했습니다.');
 
     // 승인 처리 시 방문객에게 알림 발송
     if (next === true && visit?.visitorEmail) {
