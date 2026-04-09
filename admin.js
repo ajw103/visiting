@@ -364,7 +364,7 @@ function renderTable() {
         <td>
           <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
                   data-id="${v.id}" data-confirmed="${confirmed}">
-            ${confirmed ? '담당자 확인' : '담당자 확인중'}
+            ${confirmed ? '담당자 확인' : '방문 승인하기'}
           </button>
         </td>
         <td>${formatDateTime(v.timestamp)}</td>
@@ -393,15 +393,15 @@ function renderTable() {
 // ──────────────────────────────────────────────
 // 요약 카드 업데이트
 // ──────────────────────────────────────────────
-function updateSummary() {
-  const today = new Date().toISOString().split('T')[0];
-  // 필드명을 visitDate로 변경하여 정확한 집계 유도
-  const todayVisits = allVisits.filter(v => v.visitDate === today);
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const currentMonthPrefix = todayStr.substring(0, 7); // YYYY-MM
 
-  document.getElementById('totalCount').textContent  = allVisits.length;
-  document.getElementById('todayCount').textContent  = todayVisits.length;
-  document.getElementById('enteredCount').textContent = allVisits.filter(v => v.entryTime && !v.exitTime).length;
-  document.getElementById('exitedCount').textContent  = allVisits.filter(v => v.exitTime).length;
+  const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
+  const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(currentMonthPrefix));
+
+  document.getElementById('todayCount').textContent = todayVisits.length;
+  document.getElementById('monthCount').textContent = monthVisits.length;
 }
 
 // ──────────────────────────────────────────────
@@ -409,7 +409,8 @@ function updateSummary() {
 // ──────────────────────────────────────────────
 function exportCsv() {
   const headers = ['신청일시', '방문객성명', '회사명', '연락처', '차량번호', '방문예정일자', '방문시간대', '방문목적', '담당직원소속및성명', '입차시간', '출차시간', '상태'];
-  const rows = filteredVisits.map(v => [
+  // 나에게 신청한 모든 데이터(allVisits) 내보내기
+  const rows = allVisits.map(v => [
     formatDateTime(v.timestamp),
     v.visitorName,
     v.company,
