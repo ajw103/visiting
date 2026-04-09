@@ -403,6 +403,7 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.querySelector('#hostInfo').addEventListener('focus', (e) => { e.target.blur(); this._openModal(); }); // 포커스 시에도 모달 오픈
         this.shadowRoot.querySelector('#closeModal').addEventListener('click', () => this._closeModal());
         this.shadowRoot.querySelector('#hostSearchBtn').addEventListener('click', () => this._searchHost());
+        this.shadowRoot.querySelector('#hostSearchInput').addEventListener('input', () => this._searchHost());
         this.shadowRoot.querySelector('#hostSearchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); this._searchHost(); }
         });
