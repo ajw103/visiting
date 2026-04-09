@@ -138,12 +138,27 @@ function handleLogout() {
 }
 
 function bindEvents() {
-  document.getElementById('searchInput').addEventListener('input', applyFilter);
-  document.getElementById('dateFilter').addEventListener('change', applyFilter);
-  document.getElementById('statusFilter').addEventListener('change', applyFilter);
-  document.getElementById('refreshBtn').addEventListener('click', handleRefresh);
+  document.getElementById('refreshBtn').addEventListener('click', loadVisits);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
   document.getElementById('visitTableBody').addEventListener('click', handleConfirmToggle);
+  
+  // 조회 버튼 및 엔터키 이벤트
+  const searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => applyFilter('search'));
+  }
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') applyFilter('search');
+    });
+  }
+
+  // 요약 카드 클릭 이벤트
+  const todayCard = document.getElementById('todayCard');
+  if (todayCard) todayCard.addEventListener('click', () => applyFilter('today'));
+  const monthCard = document.getElementById('monthCard');
+  if (monthCard) monthCard.addEventListener('click', () => applyFilter('month'));
 }
 
 async function handleConfirmToggle(e) {
