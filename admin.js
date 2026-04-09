@@ -149,6 +149,10 @@ function bindEvents() {
   document.getElementById('refreshBtn').addEventListener('click', loadVisits);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
   document.getElementById('visitTableBody').addEventListener('click', handleConfirmToggle);
+
+  // 임직원 업로드 버튼 (총관리자만 보임)
+  const empUploadBtn = document.getElementById('empUploadBtn');
+  if (empUploadBtn) empUploadBtn.addEventListener('click', openEmpUploadModal);
   
   // 조회 버튼 및 엔터키 이벤트
   const searchBtn = document.getElementById('searchBtn');
