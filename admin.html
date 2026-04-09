@@ -441,19 +441,19 @@
 
     <!-- 요약 카드 -->
     <div class="summary-grid">
-      <div class="summary-card total">
-        <div class="label">전체 신청</div>
-        <div class="value" id="totalCount">-</div>
-      </div>
-      <div class="summary-card today">
+      <div class="summary-card today" id="todayCard">
         <div class="label">오늘 방문 예정</div>
         <div class="value" id="todayCount">-</div>
       </div>
-      <div class="summary-card entered">
+      <div class="summary-card month" id="monthCard">
+        <div class="label">이번 달 방문</div>
+        <div class="value" id="monthCount">-</div>
+      </div>
+      <div class="summary-card entered" style="display:none">
         <div class="label">현재 입차중</div>
         <div class="value" id="enteredCount">-</div>
       </div>
-      <div class="summary-card exited">
+      <div class="summary-card exited" style="display:none">
         <div class="label">출차 완료</div>
         <div class="value" id="exitedCount">-</div>
       </div>
