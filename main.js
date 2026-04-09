@@ -50,6 +50,7 @@ class VisitorRegistrationForm extends HTMLElement {
             }
             input[type="text"],
             input[type="tel"],
+            input[type="email"],
             input[type="date"],
             select {
                 width: 100%;
@@ -320,6 +321,10 @@ class VisitorRegistrationForm extends HTMLElement {
                         <label for="contact">연락처</label>
                         <input type="tel" id="contact" name="contact" required>
                     </div>
+                    <div class="form-group">
+                        <label for="visitorEmail">이메일 <span style="font-weight:normal; color:#6c757d; font-size:0.85rem;">(선택)</span></label>
+                        <input type="email" id="visitorEmail" name="visitorEmail" placeholder="담당자 승인 결과가 메일로 안내 됩니다.">
+                    </div>
                     <div class="form-group" id="carPlateGroup">
                         <label>차량 번호 (예: 12가 3456)</label>
                         <div class="car-plate-list" id="carPlateList">
@@ -504,6 +509,7 @@ class VisitorRegistrationForm extends HTMLElement {
             visitorName:   formData.get('visitorName'),
             company:       formData.get('company'),
             contact:       formData.get('contact'),
+            visitorEmail:  formData.get('visitorEmail') || null, // 승인 결과 알림용 이메일 (선택)
             carPlates,
             visitDate:     formData.get('visitDate'),
             visitTimeSlot: `${visitHour}:${visitMinute}`,
@@ -541,8 +547,12 @@ class VisitorRegistrationForm extends HTMLElement {
 
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
         
+        // 메일 제목에 방문 예정 날짜를 포함시켜 이메일 스레드(대화 묶음) 방지
+        const subject = `[넷마블 방문예약] 새로운 방문 신청이 접수되었습니다. (${data.visitDate})`;
+
         const payload = {
             to:      this._selectedHostEmail,
+            subject: subject,     // GAS에서 메일 제목으로 사용할 필드
             visitor: data.visitorName,
             company: data.company,
             purpose: data.visitPurpose,
