@@ -149,6 +149,7 @@ function bindEvents() {
   document.getElementById('refreshBtn').addEventListener('click', loadVisits);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
   document.getElementById('visitTableBody').addEventListener('click', handleConfirmToggle);
+  document.getElementById('visitTableBody').addEventListener('click', handleParkingToggle);
 
   // 임직원 업로드 버튼 (총관리자만 보임)
   const empUploadBtn = document.getElementById('empUploadBtn');
