@@ -606,19 +606,12 @@ async function runEmpUpload() {
   progress.textContent = '파일 읽는 중...';
 
   try {
-    // EUC-KR(한국어 엑셀 기본) 또는 UTF-8 자동 감지
-    let text;
-    try {
-      text = await selectedEmpFile.text(); // UTF-8 시도
-      if (text.includes('â') || text.includes('ê') || text.includes('ë')) {
-        // 깨진 문자가 있으면 EUC-KR로 재시도
-        const buffer = await selectedEmpFile.arrayBuffer();
-        text = new TextDecoder('euc-kr').decode(buffer);
-      }
-    } catch {
-      const buffer = await selectedEmpFile.arrayBuffer();
-      text = new TextDecoder('euc-kr').decode(buffer);
-    }
+    // UTF-8 BOM 있으면 UTF-8, 없으면 한국어 엑셀 기본값인 EUC-KR로 디코딩
+    const buffer = await selectedEmpFile.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const isUtf8Bom = bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF;
+    const encoding = isUtf8Bom ? 'utf-8' : 'euc-kr';
+    const text = new TextDecoder(encoding).decode(buffer);
     const employees = parseEmployeeCsv(text);
 
     if (employees.length === 0) throw new Error('유효한 데이터가 없습니다.');
