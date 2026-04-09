@@ -466,6 +466,21 @@ function renderTable() {
     const carDisplay = Array.isArray(v.carPlates)
       ? v.carPlates.filter(Boolean).join(', ')
       : (v.carPlate || '-');
+    // 입차/출차 셀: API 미연결 시 수동 등록 버튼 표시, API 연결 시 시간만 표시
+    const entryCell = IS_API_CONNECTED
+      ? `<td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}</td>`
+      : v.entryTime
+        ? `<td class="time-cell has-time">${formatDateTime(v.entryTime)}<br><button class="parking-reset-btn" data-id="${v.id}" data-field="entry">↺ 초기화</button></td>`
+        : `<td class="time-cell no-time"><button class="parking-entry-btn" data-id="${v.id}">주차 등록</button></td>`;
+
+    const exitCell = IS_API_CONNECTED
+      ? `<td class="time-cell ${v.exitTime ? 'has-time' : 'no-time'}">${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}</td>`
+      : v.exitTime
+        ? `<td class="time-cell has-time">${formatDateTime(v.exitTime)}</td>`
+        : v.entryTime
+          ? `<td class="time-cell no-time"><button class="parking-exit-btn" data-id="${v.id}">출차 등록</button></td>`
+          : `<td class="time-cell no-time"><span class="awaiting">-</span></td>`;
+
     return `
       <tr>
         <td>
@@ -480,12 +495,8 @@ function renderTable() {
           ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
         </td>
         <td>${esc(carDisplay)}</td>
-        <td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">
-          ${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}
-        </td>
-        <td class="time-cell ${v.exitTime ? 'has-time' : 'no-time'}">
-          ${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}
-        </td>
+        ${entryCell}
+        ${exitCell}
         <td>${visitSchedule}</td>
         <td>${esc(v.visitPurpose) || '-'}</td>
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
