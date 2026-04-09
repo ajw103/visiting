@@ -14,6 +14,16 @@ import {
 } from './parking-api.js';
 
 // ──────────────────────────────────────────────
+// 알림 설정 (향후 SMS/카카오톡으로 전환 시 이 부분만 수정)
+// ──────────────────────────────────────────────
+const NOTIFICATION_CONFIG = {
+  // 현재 사용 중인 알림 채널: 'email' | 'sms' | 'kakao'
+  channel: 'email',
+  // Google Apps Script 엔드포인트 (이메일 발송 담당)
+  gasUrl: 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec',
+};
+
+// ──────────────────────────────────────────────
 // 상태
 // ──────────────────────────────────────────────
 let allVisits = [];          // Firestore에서 불러온 전체 방문 신청 목록
@@ -180,11 +190,52 @@ async function handleConfirmToggle(e) {
     btn.dataset.confirmed = String(next);
     btn.textContent = next ? '승인 완료' : '방문 승인하기';
     showToast(next ? '방문 승인 처리했습니다.' : '승인을 취소했습니다.');
+
+    // 승인 처리 시 방문객에게 알림 발송
+    if (next === true && visit?.visitorEmail) {
+      sendApprovalNotification(visit);
+    }
   } catch (err) {
     console.error(err);
     showToast('업데이트 실패. 다시 시도해 주세요.', 'error');
   } finally {
     btn.disabled = false;
+  }
+}
+
+// ──────────────────────────────────────────────
+// 방문객 승인 알림 발송
+// (향후 SMS/카카오톡 전환 시 NOTIFICATION_CONFIG.channel 값과 이 함수만 수정)
+// ──────────────────────────────────────────────
+async function sendApprovalNotification(visit) {
+  try {
+    if (NOTIFICATION_CONFIG.channel === 'email') {
+      // 현재 채널: 이메일 (GAS를 통해 발송)
+      const payload = {
+        type:        'approval',                          // GAS에서 승인 알림으로 구분하는 타입
+        to:          visit.visitorEmail,                  // 방문객 이메일
+        visitor:     visit.visitorName,                   // 방문객 성명
+        company:     visit.company,                       // 방문객 소속
+        date:        visit.visitDate,                     // 방문 예정 날짜
+        time:        visit.visitTimeSlot,                 // 방문 예정 시간
+        purpose:     visit.visitPurpose,                  // 방문 목적
+        hostInfo:    visit.hostInfo,                      // 담당자 정보
+        subject:     `[넷마블 방문예약] 방문이 승인되었습니다. (${visit.visitDate})`, // 메일 제목
+      };
+      await fetch(NOTIFICATION_CONFIG.gasUrl, {
+        method:    'POST',
+        mode:      'no-cors',
+        cache:     'no-cache',
+        keepalive: true,
+        headers:   { 'Content-Type': 'text/plain' },
+        body:      JSON.stringify(payload),
+      });
+      console.log('📬 방문객 승인 알림 발송 완료:', visit.visitorEmail);
+    }
+    // 향후 SMS 전환 시: else if (NOTIFICATION_CONFIG.channel === 'sms') { ... }
+    // 향후 카카오 전환 시: else if (NOTIFICATION_CONFIG.channel === 'kakao') { ... }
+  } catch (err) {
+    console.error('❌ 방문객 승인 알림 발송 실패:', err);
   }
 }
 
