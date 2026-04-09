@@ -151,8 +151,8 @@ function bindEvents() {
   }
 
   // 요약 카드 클릭 이벤트
-  const todayCard = document.getElementById('todayCard');
-  if (todayCard) todayCard.addEventListener('click', () => applyFilter('today'));
+  const upcomingCard = document.getElementById('upcomingCard');
+  if (upcomingCard) upcomingCard.addEventListener('click', () => applyFilter('upcoming'));
   const monthCard = document.getElementById('monthCard');
   if (monthCard) monthCard.addEventListener('click', () => applyFilter('month'));
 }
@@ -248,7 +248,7 @@ async function loadVisits() {
       await mergeParkingLogs();
     }
 
-    applyFilter('today'); // 기본적으로 오늘 방문 예정 건을 먼저 보여줌
+    applyFilter('upcoming'); // 기본적으로 오늘 이후 예정 건을 모두 보여줌
     updateSummary();
   } catch (err) {
     console.error('데이터 로드 실패:', err);
@@ -302,13 +302,14 @@ function applyFilter(type = 'search') {
   const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
   
   const now = new Date();
+  const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000));
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7);
 
   filteredVisits = allVisits.filter(v => {
     // 1. 기간 필터링 (카드 클릭 시)
-    if (type === 'today') {
-      if (v.visitDate !== todayStr) return false;
+    if (type === 'upcoming') {
+      if (!v.visitDate || v.visitDate < todayStr) return false;
     } else if (type === 'month') {
       if (!v.visitDate || !v.visitDate.startsWith(monthPrefix)) return false;
     }
@@ -334,7 +335,7 @@ function applyFilter(type = 'search') {
   // 기록 건수 업데이트
   const recordCountEl = document.getElementById('recordCount');
   if (recordCountEl) {
-    const label = type === 'today' ? '오늘 방문' : (type === 'month' ? '이번 달 방문' : '전체 검색 결과');
+    const label = type === 'upcoming' ? '진행 및 예정된 방문' : (type === 'month' ? '이번 달 방문' : '전체 검색 결과');
     recordCountEl.textContent = `${label}: ${filteredVisits.length}건`;
   }
 }
@@ -423,13 +424,13 @@ function updateSummary() {
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7); // YYYY-MM
 
-  const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
+  const upcomingVisits = allVisits.filter(v => v.visitDate && v.visitDate >= todayStr);
   const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(monthPrefix));
 
-  const todayCountEl = document.getElementById('todayCount');
+  const upcomingCountEl = document.getElementById('upcomingCount');
   const monthCountEl = document.getElementById('monthCount');
   
-  if (todayCountEl) todayCountEl.textContent = todayVisits.length;
+  if (upcomingCountEl) upcomingCountEl.textContent = upcomingVisits.length;
   if (monthCountEl) monthCountEl.textContent = monthVisits.length;
 }
 
