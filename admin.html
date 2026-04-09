@@ -349,6 +349,58 @@
 
     /* ── Logout Button ── */
     .btn-logout { background: #f8f9fa; color: #dc3545; border: 1px solid #dc3545; }
+
+    /* ── 총관리자 전용 요소 ── */
+    .role-staff .super-only { display: none !important; }
+
+    /* ── 임직원 업로드 모달 ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin: 1rem;
+    }
+    .modal-box h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .modal-desc { font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1rem; line-height: 1.6; }
+    .format-box {
+      background: var(--gray-100);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      font-family: monospace;
+      font-size: 0.78rem;
+      margin-bottom: 1.25rem;
+      color: var(--gray-800);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .file-drop-area {
+      border: 2px dashed var(--gray-400);
+      border-radius: 8px;
+      padding: 1.75rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gray-600);
+      font-size: 0.9rem;
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 1rem;
+    }
+    .file-drop-area:hover, .file-drop-area.dragover { border-color: var(--primary); background: #f0f7ff; }
+    .file-name { font-weight: 600; color: var(--primary); margin-top: 0.4rem; font-size: 0.85rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem; }
+    #empUploadProgress { font-size: 0.85rem; color: var(--gray-600); min-height: 1.4em; }
     .btn-logout:hover { background: #dc3545; color: #fff; }
 
     /* ── API 상태 배너 ── */
