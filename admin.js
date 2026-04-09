@@ -719,6 +719,11 @@ function formatDateTime(date) {
   });
 }
 
+function formatTime(date) {
+  if (!date) return '';
+  return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+}
+
 function esc(str) {
   if (!str) return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
