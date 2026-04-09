@@ -178,8 +178,8 @@ async function handleConfirmToggle(e) {
     if (visit) visit.adminConfirmed = next;
     btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
     btn.dataset.confirmed = String(next);
-    btn.textContent = next ? '담당자 확인' : '담당자 확인중';
-    showToast(next ? '담당자 확인 처리했습니다.' : '확인을 취소했습니다.');
+    btn.textContent = next ? '승인 완료' : '방문 승인하기';
+    showToast(next ? '방문 승인 처리했습니다.' : '승인을 취소했습니다.');
   } catch (err) {
     console.error(err);
     showToast('업데이트 실패. 다시 시도해 주세요.', 'error');
@@ -388,7 +388,7 @@ function renderTable() {
         <td>
           <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
                   data-id="${v.id}" data-confirmed="${confirmed}">
-            ${confirmed ? '담당자 확인' : '방문 승인하기'}
+            ${confirmed ? '승인 완료' : '방문 승인하기'}
           </button>
         </td>
         <td>${formatDateTime(v.timestamp)}</td>
