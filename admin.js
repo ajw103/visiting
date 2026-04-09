@@ -236,7 +236,7 @@ async function loadVisits() {
       await mergeParkingLogs();
     }
 
-    applyFilter();
+    applyFilter('today'); // 기본적으로 오늘 방문 예정 건을 먼저 보여줌
     updateSummary();
   } catch (err) {
     console.error('데이터 로드 실패:', err);
