@@ -301,34 +301,46 @@ async function handleRefresh() {
 // ──────────────────────────────────────────────
 // 필터 / 검색
 // ──────────────────────────────────────────────
-function applyFilter() {
-  const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-  const dateVal  = document.getElementById('dateFilter').value;        // "YYYY-MM-DD"
-  const statusVal = document.getElementById('statusFilter').value;     // "" | "pending" | "entered" | "exited"
+function applyFilter(type = 'search') {
+  const searchInput = document.getElementById('searchInput');
+  const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const monthPrefix = todayStr.substring(0, 7);
 
   filteredVisits = allVisits.filter(v => {
-    // 키워드 검색 (이름, 회사, 차량번호, 담당직원)
-    if (keyword) {
-      const haystack = [v.visitorName, v.company, v.carPlate, v.hostName]
-        .join(' ').toLowerCase();
-      if (!haystack.includes(keyword)) return false;
+    // 1. 기간 필터링 (카드 클릭 시)
+    if (type === 'today') {
+      if (v.visitDate !== todayStr) return false;
+    } else if (type === 'month') {
+      if (!v.visitDate || !v.visitDate.startsWith(monthPrefix)) return false;
     }
+    // 'search' 타입은 전체 데이터를 기준으로 함 (기간 필터 무시)
 
-    // 날짜 필터 (방문 예정일 기준)
-    if (dateVal && v.visitDate) {
-      if (v.visitDate !== dateVal) return false;
-    }
-
-    // 상태 필터
-    if (statusVal) {
-      const status = getStatus(v);
-      if (status !== statusVal) return false;
+    // 2. 통합 검색 필터링
+    if (searchVal) {
+      const matchName = v.visitorName?.toLowerCase().includes(searchVal);
+      const matchComp = v.company?.toLowerCase().includes(searchVal);
+      const matchCar  = Array.isArray(v.carPlates) 
+                        ? v.carPlates.some(p => p?.toLowerCase().includes(searchVal))
+                        : v.carPlate?.toLowerCase().includes(searchVal);
+      const matchHost = (v.hostInfo ?? v.hostName)?.toLowerCase().includes(searchVal);
+      
+      if (!matchName && !matchComp && !matchCar && !matchHost) return false;
     }
 
     return true;
   });
 
   renderTable();
+  
+  // 기록 건수 업데이트
+  const recordCountEl = document.getElementById('recordCount');
+  if (recordCountEl) {
+    const label = type === 'today' ? '오늘 방문' : (type === 'month' ? '이번 달 방문' : '전체 검색 결과');
+    recordCountEl.textContent = `${label}: ${filteredVisits.length}건`;
+  }
 }
 
 // ──────────────────────────────────────────────
