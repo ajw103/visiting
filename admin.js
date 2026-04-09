@@ -463,6 +463,21 @@ function renderTable() {
       : (v.carPlate || '-');
     return `
       <tr>
+        <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
+        <td class="visitor-info-cell">
+          <div class="v-name">${esc(v.visitorName)}</div>
+          ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
+        </td>
+        <td>${esc(carDisplay)}</td>
+        <td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">
+          ${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}
+        </td>
+        <td class="time-cell ${v.exitTime ? 'has-time' : 'no-time'}">
+          ${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}
+        </td>
+        <td>${visitSchedule}</td>
+        <td>${esc(v.visitPurpose) || '-'}</td>
+        <td>${esc(v.contact)}</td>
         <td>
           <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
                   data-id="${v.id}" data-confirmed="${confirmed}">
@@ -470,24 +485,9 @@ function renderTable() {
           </button>
           ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
         </td>
-        <td class="visitor-info-cell">
-          <div class="v-name">${esc(v.visitorName)}</div>
-          ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
-        </td>
-        <td>${visitSchedule}</td>
-        <td>${esc(v.visitPurpose) || '-'}</td>
-        <td>${esc(v.contact)}</td>
-        <td>${esc(carDisplay)}</td>
-        <td>${formatDateTime(v.timestamp)}</td>
         <td>${esc(v.company) || '-'}</td>
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
-        <td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">
-          ${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}
-        </td>
-        <td class="time-cell ${v.exitTime ? 'has-time' : 'no-time'}">
-          ${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}
-        </td>
-        <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
+        <td>${formatDateTime(v.timestamp)}</td>
       </tr>
     `;
   }).join('');
