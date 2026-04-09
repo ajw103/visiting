@@ -447,9 +447,7 @@ class VisitorRegistrationForm extends HTMLElement {
         }
 
         const employees = this._employeeCache || [];
-        const matched = employees.filter(h =>
-            h.name?.includes(queryStr) || h.dept?.includes(queryStr)
-        );
+        const matched = employees.filter(h => h.name === queryStr);
 
         if (matched.length === 0) {
             resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.</div>';
