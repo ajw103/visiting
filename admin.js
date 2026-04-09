@@ -470,16 +470,16 @@ function renderTable() {
           </button>
           ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
         </td>
-        <td>${formatDateTime(v.timestamp)}</td>
         <td class="visitor-info-cell">
           <div class="v-name">${esc(v.visitorName)}</div>
           ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
         </td>
-        <td>${esc(v.company) || '-'}</td>
-        <td>${esc(v.contact)}</td>
-        <td>${esc(carDisplay)}</td>
         <td>${visitSchedule}</td>
         <td>${esc(v.visitPurpose) || '-'}</td>
+        <td>${esc(v.contact)}</td>
+        <td>${esc(carDisplay)}</td>
+        <td>${formatDateTime(v.timestamp)}</td>
+        <td>${esc(v.company) || '-'}</td>
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
         <td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">
           ${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}
