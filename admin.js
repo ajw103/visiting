@@ -65,6 +65,9 @@ async function showDashboard() {
   updateApiStatusBadge();
   await loadVisits();
   bindEvents();
+
+  // 30초마다 주차 데이터 자동 갱신
+  setInterval(() => loadVisits(), 30000);
 }
 
 async function handleLogin() {
