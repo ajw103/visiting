@@ -393,6 +393,7 @@ function renderTable() {
 // ──────────────────────────────────────────────
 // 요약 카드 업데이트
 // ──────────────────────────────────────────────
+function updateSummary() {
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
   const currentMonthPrefix = todayStr.substring(0, 7); // YYYY-MM
@@ -400,8 +401,11 @@ function renderTable() {
   const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
   const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(currentMonthPrefix));
 
-  document.getElementById('todayCount').textContent = todayVisits.length;
-  document.getElementById('monthCount').textContent = monthVisits.length;
+  const todayCountEl = document.getElementById('todayCount');
+  const monthCountEl = document.getElementById('monthCount');
+  
+  if (todayCountEl) todayCountEl.textContent = todayVisits.length;
+  if (monthCountEl) monthCountEl.textContent = monthVisits.length;
 }
 
 // ──────────────────────────────────────────────
