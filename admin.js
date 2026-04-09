@@ -468,6 +468,7 @@ function renderTable() {
                   data-id="${v.id}" data-confirmed="${confirmed}">
             ${confirmed ? '승인 완료' : '방문 승인하기'}
           </button>
+          ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
         </td>
         <td>${formatDateTime(v.timestamp)}</td>
         <td class="visitor-info-cell">
