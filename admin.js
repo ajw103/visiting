@@ -225,15 +225,14 @@ async function handleConfirmToggle(e) {
 }
 
 // ──────────────────────────────────────────────
-// 주차 등록 / 출차 등록 / 초기화 (API 미연결 시 수동 처리)
+// 입차 / 주차 등록 (API 미연결 시 수동 처리)
 // ──────────────────────────────────────────────
 async function handleParkingToggle(e) {
-  const entryBtn = e.target.closest('.parking-entry-btn');
-  const exitBtn  = e.target.closest('.parking-exit-btn');
-  const resetBtn = e.target.closest('.parking-reset-btn');
-  if (!entryBtn && !exitBtn && !resetBtn) return;
+  const entryBtn    = e.target.closest('.parking-entry-btn');
+  const registerBtn = e.target.closest('.parking-register-btn');
+  if (!entryBtn && !registerBtn) return;
 
-  const btn = entryBtn || exitBtn || resetBtn;
+  const btn = entryBtn || registerBtn;
   const id  = btn.dataset.id;
   const now = new Date();
   btn.disabled = true;
@@ -243,27 +242,12 @@ async function handleParkingToggle(e) {
       await updateDoc(doc(db, 'visitRequests', id), { entryTime: now });
       const visit = allVisits.find(v => v.id === id);
       if (visit) visit.entryTime = now;
-      showToast('입차 시간이 등록되었습니다.');
-    } else if (exitBtn) {
-      await updateDoc(doc(db, 'visitRequests', id), { exitTime: now });
+      showToast('입차 처리되었습니다.');
+    } else if (registerBtn) {
+      await updateDoc(doc(db, 'visitRequests', id), { parkingRegisteredAt: now });
       const visit = allVisits.find(v => v.id === id);
-      if (visit) visit.exitTime = now;
-      showToast('출차 시간이 등록되었습니다.');
-    } else if (resetBtn) {
-      const field = btn.dataset.field;
-      const label = field === 'entry' ? '입차' : '출차';
-      if (!confirm(`${label} 시간을 초기화하시겠습니까?`)) { btn.disabled = false; return; }
-      // 입차 초기화 시 출차도 함께 초기화
-      const updateData = field === 'entry'
-        ? { entryTime: null, exitTime: null }
-        : { exitTime: null };
-      await updateDoc(doc(db, 'visitRequests', id), updateData);
-      const visit = allVisits.find(v => v.id === id);
-      if (visit) {
-        if (field === 'entry') { visit.entryTime = null; visit.exitTime = null; }
-        else { visit.exitTime = null; }
-      }
-      showToast(`${label} 시간이 초기화되었습니다.`);
+      if (visit) visit.parkingRegisteredAt = now;
+      showToast('주차 등록이 완료되었습니다.');
     }
     renderTable();
   } catch (err) {
