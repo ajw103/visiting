@@ -362,7 +362,10 @@ function renderTable() {
     return `
       <tr>
         <td>${formatDateTime(v.timestamp)}</td>
-        <td>${esc(v.visitorName)}</td>
+        <td class="visitor-info-cell">
+          <div class="v-name">${esc(v.visitorName)}</div>
+          ${v.company ? `<div class="v-company">(${esc(v.company)})</div>` : ''}
+        </td>
         <td>${esc(v.company) || '-'}</td>
         <td>${esc(v.contact)}</td>
         <td>${esc(carDisplay)}</td>
