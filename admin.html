@@ -564,6 +564,30 @@
   </main>
 </div>
 
+<!-- 임직원 CSV 업로드 모달 -->
+<div id="empUploadModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>👥 임직원 명단 CSV 업로드</h3>
+    <p class="modal-desc">
+      엑셀에서 <strong>다른 이름으로 저장 → CSV(쉼표로 분리)</strong>로 저장 후 업로드하세요.<br>
+      기존 명단은 <strong>전부 삭제 후 새로 등록</strong>됩니다. 첫 행은 헤더로 자동 처리됩니다.
+    </p>
+    <div class="format-box">이름,부서,이메일,직급,연락처,사번
+김우일,총무실,woo1woo1@netmarble.com,실장,010-3194-6568,NM11206003
+김용태,총무실,kyt5612@netmarble.com,팀원,010-4442-3005,NM11106002</div>
+    <div id="fileDropArea" class="file-drop-area">
+      <div>📂 CSV 파일을 클릭하거나 여기에 끌어다 놓으세요</div>
+      <div class="file-name" id="selectedFileName"></div>
+      <input type="file" id="empCsvInput" accept=".csv" style="display:none">
+    </div>
+    <div id="empUploadProgress"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="empUploadCancelBtn">취소</button>
+      <button class="btn btn-primary" id="empUploadConfirmBtn" disabled>업로드 시작</button>
+    </div>
+  </div>
+</div>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
