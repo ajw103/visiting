@@ -326,8 +326,9 @@ async function loadVisits() {
         ...raw,
         // Firestore Timestamp → Date 변환
         timestamp: raw.timestamp?.toDate?.() ?? null,
-        entryTime: raw.entryTime?.toDate?.()  ?? null,
-        exitTime:  raw.exitTime?.toDate?.()   ?? null,
+        entryTime:           raw.entryTime?.toDate?.()           ?? null,
+        exitTime:            raw.exitTime?.toDate?.()            ?? null,
+        parkingRegisteredAt: raw.parkingRegisteredAt?.toDate?.() ?? null,
         // 구버전 호환: visitDateTime → visitDate 파싱
         visitDate: raw.visitDate ?? raw.visitDateTime?.split('T')[0] ?? null,
       };
