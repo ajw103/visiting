@@ -1,0 +1,8 @@
+node_modules/
+*.log
+firebase-debug.log
+.firebase/
+*.bak
+*.zip
+.env
+auto_upload.ps1

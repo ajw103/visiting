@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>넷마블 방문예약 관리자 페이지</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #007bff;
+      --primary-dk: #0056b3;
+      --success:    #28a745;
+      --warning:    #ffc107;
+      --danger:     #dc3545;
+      --gray-100:   #f8f9fa;
+      --gray-200:   #e9ecef;
+      --gray-400:   #ced4da;
+      --gray-600:   #6c757d;
+      --gray-800:   #343a40;
+      --white:      #ffffff;
+      --shadow:     0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .admin-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
+    .header-left h1 { font-size: 1.25rem; font-weight: 700; color: var(--gray-800); }
+    .header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn-primary   { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dk); }
+    .btn-outline   { background: var(--white); color: var(--gray-800); border: 1px solid var(--gray-400); }
+    .btn-outline:hover { background: var(--gray-100); }
+    .btn-success   { background: var(--success); color: var(--white); }
+    .btn-success:hover { opacity: 0.9; }
+
+    /* API 상태 배지 */
+    .api-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .api-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .api-badge.connected    { background: #d4edda; color: #155724; }
+    .api-badge.connected::before { background: var(--success); }
+    .api-badge.disconnected { background: #fff3cd; color: #856404; }
+    .api-badge.disconnected::before { background: var(--warning); }
+
+    /* ── Main ── */
+    .main-content { padding: 1.5rem 2rem; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Summary Cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr; /* 오늘을 더 크게 */
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .summary-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .summary-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+    .summary-card .label { font-size: 0.95rem; color: var(--gray-600); margin-bottom: 0.5rem; font-weight: 500; }
+    .summary-card .value { font-size: 2.25rem; font-weight: 800; color: var(--primary); }
+    .summary-card.today .value { color: #007bff; }
+    .summary-card.month .value { font-size: 1.75rem; color: var(--gray-700); }
+
+    /* 일반 담당자(role-staff) 전용 UI 최적화 */
+    .role-staff .summary-card.entered, .role-staff .summary-card.exited { display: none; }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .filter-group input {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .btn-primary { 
+      background: var(--primary); 
+      color: #fff; 
+      border: none; 
+      padding: 0 2rem; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      height: 50px; 
+      font-weight: 600; 
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #0056b3; }
+
+    /* ── Table ── */
+    .table-wrapper {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .table-header h2 { font-size: 1rem; font-weight: 700; }
+    .record-count { font-size: 0.85rem; color: var(--gray-600); }
+
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    thead { background: var(--gray-100); }
+    th {
+      padding: 0.85rem 0.5rem;
+      text-align: center;
+      font-weight: 600;
+      color: var(--gray-600);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    td {
+      padding: 0.85rem 0.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      text-align: center;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--gray-100); }
+
+    /* 입출차 시간 셀 */
+    .time-cell.has-time  { color: var(--gray-800); font-weight: 500; }
+    .time-cell.no-time   { color: var(--gray-400); }
+    .awaiting            { font-style: italic; }
+
+    /* 그룹 헤더 (입출차) */
+    th.parking-group {
+      background: #e8f4fd;
+      color: #0056b3;
+    }
+
+    /* 상태 배지 */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-pending { background: #e9ecef; color: var(--gray-600); }
+    .status-entered { background: #fff3cd; color: #856404; }
+    .status-exited  { background: #d4edda; color: #155724; }
+
+    /* 담당자 확인 토글 */
+    .confirm-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .confirm-toggle.confirmed  { background: #d4edda; color: #155724; }
+    .confirm-toggle.unconfirmed { background: #e9ecef; color: var(--gray-600); }
+    .confirm-toggle:hover.confirmed   { background: #b8dfc5; }
+    .confirm-toggle:hover.unconfirmed { background: #d1d9e0; }
+
+    /* 빈 상태 */
+    #emptyState {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--gray-600);
+    }
+    #emptyState p { margin-top: 0.5rem; font-size: 0.9rem; }
+
+    /* ── 로딩 오버레이 ── */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--gray-800);
+      color: var(--white);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 300;
+      white-space: nowrap;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast.error { background: var(--danger); }
+
+    /* ── Login Overlay ── */
+    #loginSection {
+      position: fixed;
+      inset: 0;
+      background: var(--gray-800);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      overflow-y: auto; /* 작은 화면에서 세로 스크롤 허용 */
+    }
+    .login-card {
+      background: var(--white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-card h2 { margin-bottom: 0.5rem; font-size: 1.5rem; color: var(--gray-800); }
+    .login-card p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 2rem; }
+    .login-form { text-align: left; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--gray-600); }
+    .form-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--gray-400); border-radius: 6px; font-size: 1rem; }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0,123,255,0.2); }
+    .login-btn { width: 100%; padding: 0.9rem; background: var(--primary); color: var(--white); border: none; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+    .login-btn:active { transform: scale(0.98); }
+    .login-btn:hover { background: var(--primary-dk); }
+    
+    /* ── Hide/Show ── */
+    .content-wrapper { display: none; }
+    .authenticated .content-wrapper { display: block; }
+    .authenticated #loginSection { display: none; }
+
+    /* 일반 담당자(role-staff) 전용 UI 최적화 */
+    .role-staff #recordCount { display: none !important; }
+    .role-staff table { min-width: auto; } /* 모바일에서 꽉 차게 보이도록 고정폭 제거 */
+    .role-staff table th:nth-child(2), .role-staff table td:nth-child(2) { display: none; } /* 신청일시 숨김 */
+    .role-staff table th:nth-child(4), .role-staff table td:nth-child(4) { display: none; } /* 회사명 숨김 */
+    .role-staff table th:nth-child(9), .role-staff table td:nth-child(9) { display: none; } /* 담당직원 숨김 */
+    .role-staff table th:nth-child(10), .role-staff table td:nth-child(10),
+    .role-staff table th:nth-child(11), .role-staff table td:nth-child(11) { display: none; } /* 입출차 시간 숨김 */
+    .role-staff table th:nth-child(12), .role-staff table td:nth-child(12) { display: none; } /* 상태 열 숨김 */
+
+    /* 모바일 환경 최적화 (768px 미만) */
+    @media (max-width: 768px) {
+      .container { padding: 0.5rem; }
+      .header { padding: 1rem; flex-direction: column; gap: 1rem; text-align: center; }
+      .table-wrapper { padding: 0.5rem; border-radius: 0; }
+      th, td { padding: 0.75rem 0.5rem; font-size: 0.8rem; }
+      .role-staff table { min-width: 600px; } /* 모바일에서도 최소한의 가독성 확보 */
+      .v-name { font-size: 0.95rem; }
+      .confirm-toggle { padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+    }
+
+    /* 이름+회사명 통합 스타일 */
+    .visitor-info-cell { line-height: 1.4; vertical-align: middle; }
+    .v-name { font-weight: 600; color: var(--gray-800); font-size: 1.05rem; }
+    .v-company { font-size: 0.82em; color: var(--gray-600); margin-top: 1px; }
+
+    /* ── Logout Button ── */
+    .btn-logout { background: #f8f9fa; color: #dc3545; border: 1px solid #dc3545; }
+    .btn-logout:hover { background: #dc3545; color: #fff; }
+
+    /* ── API 상태 배너 ── */
+    .api-info-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: #664d03;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .api-info-banner.hidden { display: none; }
+    .api-info-banner strong { display: block; margin-bottom: 0.2rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .main-content { padding: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
+      .summary-card { padding: 1rem; }
+      .summary-card .value { font-size: 1.5rem; }
+      .admin-header { padding: 0.75rem; justify-content: center; text-align: center; }
+      .header-left { justify-content: center; width: 100%; margin-bottom: 0.5rem; }
+      .header-left h1 { font-size: 1.1rem; }
+      .header-right { justify-content: center; width: 100%; }
+      .header-right .btn { flex: 1; justify-content: center; padding: 0.4rem; font-size: 0.8rem; }
+      .main-content { padding: 0.75rem; }
+      .filter-bar { padding: 0.75rem; gap: 0.5rem; }
+      #searchInput { width: 100%; }
+      .login-card { padding: 1.5rem 1.25rem; }
+      .login-card h2 { font-size: 1.25rem; }
+      .form-group input { padding: 0.7rem; font-size: 0.95rem; }
+      .table-header { padding: 0.8rem 1rem; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 로딩 오버레이 -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <span>데이터 불러오는 중...</span>
+</div>
+
+<!-- 토스트 알림 -->
+<div id="toast" class="toast"></div>
+
+<!-- 로그인 섹션 -->
+<div id="loginSection">
+  <div class="login-card">
+    <h2>관리자 인증</h2>
+    <p>성함과 사번을 입력하여 로그인해 주세요.</p>
+    <div class="login-form">
+      <div class="form-group">
+        <label for="adminNameInput">성함</label>
+        <input type="text" id="adminNameInput" placeholder="이름 입력">
+      </div>
+      <div class="form-group">
+        <label for="adminEmpIdInput">사번 (비밀번호)</label>
+        <input type="password" id="adminEmpIdInput" placeholder="사번 입력">
+      </div>
+      <button type="button" class="login-btn" id="adminLoginBtn">로그인</button>
+    </div>
+  </div>
+</div>
+
+<div class="content-wrapper">
+  <!-- 헤더 -->
+  <header class="admin-header">
+    <div class="header-left">
+      <h1>넷마블 방문예약 관리자 페이지</h1>
+      <span id="apiStatus" class="api-badge">확인 중...</span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
+      <button class="btn btn-success" id="exportBtn">↓ CSV 내보내기</button>
+      <button class="btn btn-logout" id="logoutBtn" style="margin-left: 10px;">로그아웃</button>
+      <a href="index.html" class="btn btn-outline" style="margin-left: 5px;">← 통합 메인</a>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- 주차관제 API 미연결 안내 배너 -->
+    <div class="api-info-banner" id="apiBanner">
+      <span>ℹ</span>
+      <div>
+        <strong>주차관제 API 미연결 상태입니다.</strong>
+        입차·출차 시간은 주차관제 업체로부터 API를 전달받은 후 <code>parking-api.js</code>에 연동하면 자동으로 표시됩니다.
+      </div>
+    </div>
+
+    <!-- 요약 카드 -->
+    <div class="summary-grid">
+      <div class="summary-card today" id="todayCard">
+        <div class="label">오늘 방문 예정</div>
+        <div class="value" id="todayCount">-</div>
+      </div>
+      <div class="summary-card month" id="monthCard">
+        <div class="label">이번 달 방문</div>
+        <div class="value" id="monthCount">-</div>
+      </div>
+      <div class="summary-card entered" style="display:none">
+        <div class="label">현재 입차중</div>
+        <div class="value" id="enteredCount">-</div>
+      </div>
+      <div class="summary-card exited" style="display:none">
+        <div class="label">출차 완료</div>
+        <div class="value" id="exitedCount">-</div>
+      </div>
+    </div>
+
+    <!-- 필터 바 -->
+    <div class="filter-bar">
+      <div class="filter-group" style="flex: 1;">
+        <input type="text" id="searchInput" placeholder="성명, 회사명, 차량번호 등 통합 검색" style="padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: 8px; width: 100%;">
+      </div>
+      <button class="btn btn-primary" id="searchBtn" style="padding: 0 2rem; height: 50px; font-weight: 600; border-radius: 8px;">조회</button>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>방문 신청 목록</h2>
+        <span class="record-count" id="recordCount"></span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>담당자 확인</th>
+              <th>신청일시</th>
+              <th>방문객 성명</th>
+              <th>회사명</th>
+              <th>연락처</th>
+              <th>차량번호</th>
+              <th>방문 예정 일자 / 시간</th>
+              <th>방문 목적</th>
+              <th>담당직원 소속 및 성명</th>
+              <th class="parking-group">입차 시간 ⓟ</th>
+              <th class="parking-group">출차 시간 ⓟ</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody id="visitTableBody"></tbody>
+        </table>
+        <div id="emptyState">
+          <div style="font-size:2rem;">📋</div>
+          <p>표시할 방문 신청 내역이 없습니다.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script src="firebase-config.js" type="module"></script>
+<script src="admin.js" type="module"></script>
+
+<script type="module">
+  // API 연결 시 안내 배너 숨기기
+  import { IS_API_CONNECTED } from './parking-api.js';
+  if (IS_API_CONNECTED) {
+    document.getElementById('apiBanner').classList.add('hidden');
+  }
+</script>
+
+<script>
+  // 레코드 수 표시 (admin.js의 renderTable 이후 업데이트)
+  const _origRender = window._renderHook;
+  const observer = new MutationObserver(() => {
+    const rows = document.getElementById('visitTableBody')?.querySelectorAll('tr').length ?? 0;
+    const el = document.getElementById('recordCount');
+    if (el) el.textContent = rows > 0 ? `총 ${rows}건` : '';
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const tbody = document.getElementById('visitTableBody');
+    if (tbody) observer.observe(tbody, { childList: true });
+  });
+</script>
+
+</body>
+</html>

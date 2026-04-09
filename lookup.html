@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>넷마블 방문예약 내역 조회</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    .page-top {
+      background: #007bff;
+      color: #fff;
+      text-align: center;
+      padding: 2rem 2rem 1.75rem;
+    }
+    .page-top h1 { font-size: 1.4rem; font-weight: 700; }
+
+    .search-section {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .search-section label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .search-row input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+    }
+    .search-btn {
+      padding: 0.7rem 1.2rem;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: #0056b3; }
+
+    .results-section {
+      padding: 1.25rem 2rem 1.5rem;
+    }
+
+    .result-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    .result-item {
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .result-item:last-child { margin-bottom: 0; }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.9rem;
+    }
+    .visitor-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #212529;
+    }
+    .visitor-company {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.15rem;
+    }
+
+    .confirm-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .confirm-badge.confirmed {
+      background: #d4edda;
+      color: #155724;
+    }
+    .confirm-badge.unconfirmed {
+      background: #e9ecef;
+      color: #6c757d;
+    }
+
+    .result-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem 1rem;
+    }
+    .detail-item { font-size: 0.85rem; }
+    .detail-item .detail-label {
+      color: #6c757d;
+      font-size: 0.75rem;
+      margin-bottom: 0.15rem;
+    }
+    .detail-item .detail-value {
+      color: #212529;
+      font-weight: 500;
+    }
+    .detail-item.full-width { grid-column: 1 / -1; }
+
+    .actions {
+      padding: 1rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: background 0.15s;
+    }
+    .btn-outline {
+      background: #fff;
+      color: #343a40;
+      border: 1px solid #ced4da;
+    }
+    .btn-outline:hover { background: #f8f9fa; }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.75rem 2rem; }
+      .search-section, .results-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .actions { padding: 1rem 1.25rem 1.25rem; }
+      .page-top { padding: 1.5rem 1.25rem; }
+      .result-detail { grid-template-columns: 1fr; }
+      .detail-item.full-width { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="page-top">
+    <h1>넷마블 방문예약 내역 조회</h1>
+  </div>
+
+  <div class="search-section">
+    <label for="contactInput">등록 시 입력한 연락처로 조회하세요</label>
+    <div class="search-row">
+      <input type="tel" id="contactInput" placeholder="예) 010-1234-5678" inputmode="tel">
+      <button class="search-btn" id="searchBtn">조회</button>
+    </div>
+  </div>
+
+  <div class="results-section" id="resultsSection" style="display:none;">
+    <div id="resultsList"></div>
+  </div>
+
+  <div class="actions">
+    <a href="index.html" class="btn btn-outline">방문 등록하러 가기</a>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script type="module">
+  import { db } from './firebase-config.js';
+  import {
+    collection, query, where, getDocs, orderBy,
+  } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+  const searchBtn     = document.getElementById('searchBtn');
+  const contactInput  = document.getElementById('contactInput');
+  const resultsSection = document.getElementById('resultsSection');
+  const resultsList   = document.getElementById('resultsList');
+
+  searchBtn.addEventListener('click', search);
+  contactInput.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+
+  // 하이픈 제거 후 숫자만 추출
+  function digits(str) { return str.replace(/\D/g, ''); }
+
+  // 숫자 문자열 → 하이픈 포함 형식 (11자리: 010-1234-5678, 10자리: 02-1234-5678 등)
+  function addHyphens(d) {
+    if (d.length === 11) return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+    if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+    return d;
+  }
+
+  async function search() {
+    const raw = contactInput.value.trim();
+    if (!raw) { contactInput.focus(); return; }
+
+    const d = digits(raw);
+    // 검색할 후보 형식: 입력 그대로 + 하이픈 제거 + 하이픈 추가
+    const candidates = [...new Set([raw, d, addHyphens(d)].filter(Boolean))];
+
+    searchBtn.disabled = true;
+    searchBtn.textContent = '조회 중...';
+    resultsList.innerHTML = '';
+    resultsSection.style.display = 'none';
+
+    try {
+      // 각 후보로 쿼리 후 중복 제거
+      const seen = new Set();
+      const docs = [];
+      await Promise.all(candidates.map(async contact => {
+        const q = query(
+          collection(db, 'visitRequests'),
+          where('contact', '==', contact)
+        );
+        const snap = await getDocs(q);
+        snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); docs.push(d); } });
+      }));
+      // timestamp 내림차순 정렬
+      docs.sort((a, b) => (b.data().timestamp?.seconds ?? 0) - (a.data().timestamp?.seconds ?? 0));
+      const snapshot = { empty: docs.length === 0, docs };
+
+      resultsSection.style.display = 'block';
+
+      if (snapshot.empty) {
+        resultsList.innerHTML = '<div class="result-empty">조회된 방문 신청 내역이 없습니다.<br>연락처를 다시 확인해 주세요.</div>';
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      const futureDocs = snapshot.docs.filter(d => {
+        const v = d.data();
+        return (v.visitDate ?? '') >= today;
+      });
+
+      if (futureDocs.length === 0) {
+        resultsList.innerHTML = '<div class="result-empty">오늘 이후의 예약 내역이 없습니다.</div>';
+        return;
+      }
+
+      resultsList.innerHTML = futureDocs.map(d => {
+        const v = d.data();
+        const confirmed = v.adminConfirmed === true;
+
+        const visitDate   = v.visitDate   ?? '-';
+        const timeSlot    = v.visitTimeSlot ? `<br>${esc(v.visitTimeSlot)}` : '';
+        const carPlates   = Array.isArray(v.carPlates)
+          ? v.carPlates.filter(Boolean).join(', ')
+          : (v.carPlate || '-');
+        const appliedAt   = v.timestamp?.toDate
+          ? v.timestamp.toDate().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+          : '-';
+
+        return `
+          <div class="result-item">
+            <div class="result-header">
+              <div>
+                <div class="visitor-name">${esc(v.visitorName)}</div>
+                ${v.company ? `<div class="visitor-company">${esc(v.company)}</div>` : ''}
+              </div>
+              <span class="confirm-badge ${confirmed ? 'confirmed' : 'unconfirmed'}">
+                ${confirmed ? '담당자 확인' : '담당자 확인중'}
+              </span>
+            </div>
+            <div class="result-detail">
+              <div class="detail-item">
+                <div class="detail-label">방문 예정일</div>
+                <div class="detail-value">${esc(visitDate)}${timeSlot}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">방문 목적</div>
+                <div class="detail-value">${esc(v.visitPurpose) || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">담당직원</div>
+                <div class="detail-value">${esc(v.hostInfo) || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">차량 번호</div>
+                <div class="detail-value">${esc(carPlates)}</div>
+              </div>
+              <div class="detail-item full-width">
+                <div class="detail-label">신청일</div>
+                <div class="detail-value">${appliedAt}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      resultsSection.style.display = 'block';
+      resultsList.innerHTML = '<div class="result-empty">조회 중 오류가 발생했습니다.<br>잠시 후 다시 시도해 주세요.</div>';
+    } finally {
+      searchBtn.disabled = false;
+      searchBtn.textContent = '조회';
+    }
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+</script>
+
+</body>
+</html>
