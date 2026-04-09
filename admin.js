@@ -49,10 +49,6 @@ async function showDashboard() {
   const role = sessionStorage.getItem('admin_role') || 'staff';
   document.body.classList.add('authenticated');
   document.body.classList.add(`role-${role}`); // 역할별 클래스 추가 (UI 제어용)
-  
-  // 오늘 날짜를 기본값으로 설정
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('dateFilter').value = today;
 
   updateApiStatusBadge();
   await loadVisits();
