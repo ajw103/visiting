@@ -225,6 +225,55 @@ async function handleConfirmToggle(e) {
 }
 
 // ──────────────────────────────────────────────
+// 주차 등록 / 출차 등록 / 초기화 (API 미연결 시 수동 처리)
+// ──────────────────────────────────────────────
+async function handleParkingToggle(e) {
+  const entryBtn = e.target.closest('.parking-entry-btn');
+  const exitBtn  = e.target.closest('.parking-exit-btn');
+  const resetBtn = e.target.closest('.parking-reset-btn');
+  if (!entryBtn && !exitBtn && !resetBtn) return;
+
+  const btn = entryBtn || exitBtn || resetBtn;
+  const id  = btn.dataset.id;
+  const now = new Date();
+  btn.disabled = true;
+
+  try {
+    if (entryBtn) {
+      await updateDoc(doc(db, 'visitRequests', id), { entryTime: now });
+      const visit = allVisits.find(v => v.id === id);
+      if (visit) visit.entryTime = now;
+      showToast('입차 시간이 등록되었습니다.');
+    } else if (exitBtn) {
+      await updateDoc(doc(db, 'visitRequests', id), { exitTime: now });
+      const visit = allVisits.find(v => v.id === id);
+      if (visit) visit.exitTime = now;
+      showToast('출차 시간이 등록되었습니다.');
+    } else if (resetBtn) {
+      const field = btn.dataset.field;
+      const label = field === 'entry' ? '입차' : '출차';
+      if (!confirm(`${label} 시간을 초기화하시겠습니까?`)) { btn.disabled = false; return; }
+      // 입차 초기화 시 출차도 함께 초기화
+      const updateData = field === 'entry'
+        ? { entryTime: null, exitTime: null }
+        : { exitTime: null };
+      await updateDoc(doc(db, 'visitRequests', id), updateData);
+      const visit = allVisits.find(v => v.id === id);
+      if (visit) {
+        if (field === 'entry') { visit.entryTime = null; visit.exitTime = null; }
+        else { visit.exitTime = null; }
+      }
+      showToast(`${label} 시간이 초기화되었습니다.`);
+    }
+    renderTable();
+  } catch (err) {
+    console.error(err);
+    showToast('업데이트 실패. 다시 시도해 주세요.', 'error');
+    btn.disabled = false;
+  }
+}
+
+// ──────────────────────────────────────────────
 // 방문객 승인 알림 발송
 // (향후 SMS/카카오톡 전환 시 NOTIFICATION_CONFIG.channel 값과 이 함수만 수정)
 // ──────────────────────────────────────────────
