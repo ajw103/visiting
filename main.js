@@ -414,11 +414,22 @@ class VisitorRegistrationForm extends HTMLElement {
         this._hosts = [];
     }
 
-    _openModal() {
+    async _openModal() {
         this.shadowRoot.querySelector('#hostModal').classList.add('show');
         this.shadowRoot.querySelector('#hostSearchInput').value = '';
-        this.shadowRoot.querySelector('#hostSearchResults').innerHTML = '<div class="no-result">성명을 입력하고 검색 버튼을 누르세요.</div>';
+        this.shadowRoot.querySelector('#hostSearchResults').innerHTML = '<div class="no-result">성명 또는 부서를 입력하세요.</div>';
         setTimeout(() => this.shadowRoot.querySelector('#hostSearchInput').focus(), 100);
+
+        // 직원 목록 캐시 (모달 열 때 한 번만 로드)
+        if (!this._employeeCache) {
+            try {
+                const snapshot = await getDocs(collection(db, 'employees'));
+                this._employeeCache = snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error('직원 목록 로드 오류:', e);
+                this._employeeCache = [];
+            }
+        }
     }
 
     _closeModal() {
