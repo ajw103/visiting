@@ -66,8 +66,10 @@ async function showDashboard() {
   await loadVisits();
   bindEvents();
 
-  // 30초마다 주차 데이터 자동 갱신
-  setInterval(() => loadVisits(), 30000);
+  // API 연결 시에만 30초마다 주차 데이터 자동 갱신
+  if (IS_API_CONNECTED) {
+    setInterval(() => loadVisits(), 30000);
+  }
 }
 
 async function handleLogin() {
