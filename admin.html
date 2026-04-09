@@ -461,14 +461,10 @@
 
     <!-- 필터 바 -->
     <div class="filter-bar">
-      <input type="text"  id="searchInput"  placeholder="이름, 회사, 차량번호, 담당직원 검색">
-      <input type="date"  id="dateFilter"   title="방문 예정일 필터">
-      <select id="statusFilter">
-        <option value="">전체 상태</option>
-        <option value="pending">신청됨</option>
-        <option value="entered">입차중</option>
-        <option value="exited">출차완료</option>
-      </select>
+      <div class="filter-group" style="flex: 1;">
+        <input type="text" id="searchInput" placeholder="성명, 회사명, 차량번호 등 통합 검색" style="padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: 8px; width: 100%;">
+      </div>
+      <button class="btn btn-primary" id="searchBtn" style="padding: 0 2rem; height: 50px; font-weight: 600; border-radius: 8px;">조회</button>
     </div>
 
     <!-- 테이블 -->
