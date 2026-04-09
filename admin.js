@@ -377,7 +377,12 @@ function applyFilter(type = 'search') {
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7);
 
+  const role = sessionStorage.getItem('admin_role');
+
   filteredVisits = allVisits.filter(v => {
+    // 총관리자는 승인된 건만 표시
+    if (role === 'super' && !v.adminConfirmed) return false;
+
     // 1. 기간 필터링
     if (type === 'today') {
       if (v.visitDate !== todayStr) return false;
