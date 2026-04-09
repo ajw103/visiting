@@ -361,6 +361,12 @@ function renderTable() {
       : (v.carPlate || '-');
     return `
       <tr>
+        <td>
+          <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
+                  data-id="${v.id}" data-confirmed="${confirmed}">
+            ${confirmed ? '담당자 확인' : '담당자 확인중'}
+          </button>
+        </td>
         <td>${formatDateTime(v.timestamp)}</td>
         <td class="visitor-info-cell">
           <div class="v-name">${esc(v.visitorName)}</div>
@@ -379,12 +385,6 @@ function renderTable() {
           ${v.exitTime ? formatDateTime(v.exitTime) : '<span class="awaiting">-</span>'}
         </td>
         <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
-        <td>
-          <button class="confirm-toggle ${confirmed ? 'confirmed' : 'unconfirmed'}"
-                  data-id="${v.id}" data-confirmed="${confirmed}">
-            ${confirmed ? '담당자 확인' : '담당자 확인중'}
-          </button>
-        </td>
       </tr>
     `;
   }).join('');
