@@ -264,6 +264,23 @@ async function handleParkingToggle(e) {
 }
 
 // ──────────────────────────────────────────────
+// 회의실 예약 Google Calendar URL 생성
+// ──────────────────────────────────────────────
+function buildCalendarUrl(v) {
+  const title = encodeURIComponent(`[${v.company || ''}] ${v.visitorName || ''} - ${v.visitPurpose || ''}`);
+  let datesParam = '';
+  if (v.visitDate && v.visitTimeSlot) {
+    const dateStr = v.visitDate.replace(/-/g, '');
+    const [hour, minute] = v.visitTimeSlot.split(':').map(Number);
+    const startH = String(hour).padStart(2, '0');
+    const startM = String(minute).padStart(2, '0');
+    const endH  = String(hour + 1).padStart(2, '0');
+    datesParam = `&dates=${dateStr}T${startH}${startM}00/${dateStr}T${endH}${startM}00`;
+  }
+  return `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}${datesParam}&state=%5Bnull%2Cnull%2Cnull%2Cnull%2C%5B13%5D%5D`;
+}
+
+// ──────────────────────────────────────────────
 // 방문객 승인 알림 발송
 // (향후 SMS/카카오톡 전환 시 NOTIFICATION_CONFIG.channel 값과 이 함수만 수정)
 // ──────────────────────────────────────────────
