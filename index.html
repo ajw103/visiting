@@ -508,7 +508,7 @@
 
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
 
-        async function sendViaEmail() {
+        function sendViaEmail() {
             const emailInput = document.getElementById('shareEmailInput');
             const email = emailInput.value.trim();
             if (!email) {
@@ -517,25 +517,19 @@
             }
             const link = getRegisterLink();
             const btn = document.getElementById('modalSendBtn');
-            btn.disabled = true;
-            btn.textContent = '발송 중...';
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'shareLink',
+                    to: email,
+                    link: link
+                })
+            });
+
             emailInput.disabled = true;
-
-            try {
-                await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        type: 'shareLink',
-                        to: email,
-                        link: link
-                    })
-                });
-            } catch (e) {
-                // no-cors 모드에서는 항상 성공으로 처리
-            }
-
             document.getElementById('sendSuccessMsg').style.display = 'block';
             btn.textContent = '창 닫기';
             btn.onclick = closeShareModal;
