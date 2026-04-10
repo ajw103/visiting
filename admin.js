@@ -529,7 +529,7 @@ function renderTable() {
                   data-id="${v.id}" data-confirmed="${confirmed}">
             ${confirmed ? '승인 완료' : '방문 승인하기'}
           </button>
-          ${confirmed ? `<a href="https://gapps.nmn.io/" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
+          ${confirmed ? `<a href="https://calendar.google.com/calendar/u/0/r/eventedit?state=%5Bnull%2Cnull%2Cnull%2Cnull%2C%5B13%5D%5D" target="_blank" class="room-booking-btn">회의실 예약 →</a>` : ''}
         </td>
         <td class="visitor-info-cell">
           <div class="v-name">${esc(v.visitorName)}</div>
