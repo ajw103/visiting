@@ -457,10 +457,10 @@
                         id="shareEmailInput"
                         class="modal-email-input"
                         placeholder="example@email.com"
-                        onkeydown="if(event.key==='Enter') sendViaEmail()"
                     >
-                    <button class="modal-send-btn" onclick="sendViaEmail()">발송하기</button>
+                    <button class="modal-send-btn" id="modalSendBtn" onclick="sendViaEmail()">발송하기</button>
                 </div>
+                <p id="sendSuccessMsg" style="display:none; margin-top:0.8rem; font-size:0.88rem; color:#452f27; font-weight:700;">✅ 발송이 완료되었습니다.</p>
 
                 <div class="modal-divider">또는</div>
 
