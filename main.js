@@ -511,6 +511,7 @@ class VisitorRegistrationForm extends HTMLElement {
             hostInfo:      formData.get('hostInfo'),
             hostEmpId:     this._selectedHostEmpId, // 담당자 사번 정보 추가
             timestamp:     new Date(),
+            expireAt:      new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000), // 5년 후 자동 삭제
         };
 
         btn.disabled = true;
