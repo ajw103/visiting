@@ -208,7 +208,7 @@ async function handleConfirmToggle(e) {
     if (existingLink) existingLink.remove();
     if (next) {
       const link = document.createElement('a');
-      link.href = 'https://gapps.nmn.io/';
+      link.href = 'https://calendar.google.com/calendar/u/0/r/eventedit?state=%5Bnull%2Cnull%2Cnull%2Cnull%2C%5B13%5D%5D';
       link.target = '_blank';
       link.className = 'room-booking-btn';
       link.textContent = '회의실 예약 →';
