@@ -303,7 +303,7 @@ class VisitorRegistrationForm extends HTMLElement {
                     <div class="consent-text">
                         • 수집 목적: 넷마블 방문 예약 및 출입 관리<br>
                         • 수집 항목: 방문객 성명, 소속, 연락처, 차량번호<br>
-                        • 보유 및 이용 기간: 방문 목적 달성 시 즉시 파기
+                        • 보유 및 이용 기간: 수집일로부터 5년 보관 후 파기
                     </div>
                 </div>
 
