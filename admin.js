@@ -375,7 +375,7 @@ function buildApprovalEmailHtml(visit) {
         <td style="padding:20px 40px;text-align:center;">
           <p style="color:#c5ae9e;font-size:11px;margin:0;line-height:1.7;">
             본 메일은 넷마블 방문예약 시스템에서 자동 발송된 메일입니다.<br>
-            ©2025 Netmarble Corp. All rights reserved.
+            ©2026 Netmarble Corp. All rights reserved.
           </p>
         </td>
       </tr>
