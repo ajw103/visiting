@@ -276,7 +276,7 @@ function buildCalendarUrl(v) {
     const endH  = String(hour + 1).padStart(2, '0');
     datesParam = `&dates=${dateStr}T${startH}${startM}00/${dateStr}T${endH}${startM}00`;
   }
-  return `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}${datesParam}&location=${encodeURIComponent('테스트 회의실')}&state=%5Bnull%2Cnull%2Cnull%2Cnull%2C%5B13%5D%5D`;
+  return `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}${datesParam}&state=%5Bnull%2Cnull%2Cnull%2Cnull%2C%5B13%5D%5D`;
 }
 
 // ──────────────────────────────────────────────
