@@ -494,6 +494,12 @@
         function closeShareModal() {
             document.getElementById('shareModal').classList.remove('open');
             document.getElementById('shareEmailInput').value = '';
+            document.getElementById('shareEmailInput').disabled = false;
+            document.getElementById('sendSuccessMsg').style.display = 'none';
+            const btn = document.getElementById('modalSendBtn');
+            btn.textContent = '발송하기';
+            btn.onclick = sendViaEmail;
+            btn.disabled = false;
         }
 
         function handleOverlayClick(e) {
