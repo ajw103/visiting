@@ -206,10 +206,7 @@
             background: #f2ebe7;
             color: var(--nm-brown-dark);
         }
-        .copy-card .copy-icon {
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
+        .copy-card .copy-icon { font-size: 1rem; flex-shrink: 0; }
 
         /* ─── 카드 헤더 ─── */
         .card-header {
@@ -219,15 +216,8 @@
             padding: 1rem 1.3rem;
             border-bottom: 1px solid var(--nm-border);
         }
-        .card-header-icon {
-            color: var(--nm-brown-dark);
-            font-size: 1rem;
-        }
-        .card-header-title {
-            font-size: 0.97rem;
-            font-weight: 700;
-            color: var(--nm-text);
-        }
+        .card-header-icon { color: var(--nm-brown-dark); font-size: 1rem; }
+        .card-header-title { font-size: 0.97rem; font-weight: 700; color: var(--nm-text); }
 
         /* ─── 방문절차 ─── */
         .process-wrap {
@@ -236,53 +226,120 @@
             justify-content: space-evenly;
             padding: 1.4rem 1rem;
         }
-        .process-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.55rem;
-        }
+        .process-step { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; }
         .step-circle {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            background: var(--nm-bg);
-            border: 1.5px solid var(--nm-border);
-            display: flex;
+            width: 54px; height: 54px; border-radius: 50%;
+            background: var(--nm-bg); border: 1.5px solid var(--nm-border);
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+        }
+        .step-label { font-size: 0.76rem; color: var(--nm-text-sub); text-align: center; line-height: 1.3; font-weight: 500; }
+        .step-arrow { color: var(--nm-brown-light); font-size: 1.2rem; margin-bottom: 1.6rem; flex-shrink: 0; }
+
+        /* ─── 공유 모달 ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(45,31,26,0.55);
+            z-index: 200;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            padding: 1rem;
         }
-        .step-label {
-            font-size: 0.76rem;
-            color: var(--nm-text-sub);
-            text-align: center;
-            line-height: 1.3;
-            font-weight: 500;
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--nm-white);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(69,47,39,0.22);
+            animation: modalIn 0.2s ease;
         }
-        .step-arrow {
-            color: var(--nm-brown-light);
-            font-size: 1.2rem;
-            margin-bottom: 1.6rem;
-            flex-shrink: 0;
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            background: var(--nm-brown-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.4rem;
+        }
+        .modal-title { color: var(--nm-white); font-size: 0.97rem; font-weight: 700; }
+        .modal-close {
+            background: none; border: none;
+            color: var(--nm-brown-light); font-size: 1.3rem;
+            cursor: pointer; line-height: 1; padding: 0.1rem 0.3rem;
+            transition: color 0.15s;
+        }
+        .modal-close:hover { color: var(--nm-white); }
+        .modal-body { padding: 1.6rem 1.4rem 1.4rem; }
+        .modal-label {
+            font-size: 0.83rem; color: var(--nm-text-sub);
+            margin-bottom: 0.65rem; font-weight: 500;
+        }
+        .modal-input-row { display: flex; gap: 0.5rem; }
+        .modal-email-input {
+            flex: 1;
+            border: 1.5px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: var(--nm-text);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .modal-email-input:focus { border-color: var(--nm-brown-dark); }
+        .modal-email-input::placeholder { color: var(--nm-brown-light); }
+        .modal-send-btn {
+            background: var(--nm-brown-dark); color: white;
+            border: none; border-radius: 8px;
+            padding: 0.75rem 1.1rem;
+            font-size: 0.9rem; font-weight: 700;
+            cursor: pointer;
+            font-family: 'Noto Sans KR', sans-serif;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .modal-send-btn:hover { background: var(--nm-brown-mid); }
+        .modal-divider {
+            display: flex; align-items: center; gap: 0.8rem;
+            margin: 1.2rem 0;
+            color: var(--nm-brown-light); font-size: 0.78rem;
+        }
+        .modal-divider::before, .modal-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--nm-border);
+        }
+        .modal-copy-btn {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            width: 100%;
+            background: var(--nm-bg);
+            border: 1.5px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem; font-weight: 600;
+            color: var(--nm-brown-dark);
+            cursor: pointer;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .modal-copy-btn:hover { background: #f0ebe7; border-color: var(--nm-brown-light); }
+        .modal-hint {
+            font-size: 0.76rem; color: var(--nm-brown-light);
+            text-align: center; margin-top: 0.75rem; line-height: 1.5;
         }
 
         /* ─── 토스트 ─── */
         .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(69,47,39,0.92);
-            color: white;
-            padding: 0.7rem 1.4rem;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000;
-            white-space: nowrap;
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            background: rgba(69,47,39,0.92); color: white;
+            padding: 0.7rem 1.4rem; border-radius: 20px;
+            font-size: 0.88rem; opacity: 0;
+            transition: opacity 0.3s; pointer-events: none;
+            z-index: 1000; white-space: nowrap;
         }
         .toast.show { opacity: 1; }
     </style>
@@ -319,8 +376,8 @@
             </div>
         </div>
 
-        <!-- 링크 복사 카드 -->
-        <button class="copy-card" onclick="copyRegisterLink()">
+        <!-- 링크 발송 카드 -->
+        <button class="copy-card" onclick="openShareModal()">
             <span class="copy-icon">🔗</span>
             <span>방문 신청 링크 복사해서 발송하기</span>
         </button>
@@ -356,10 +413,40 @@
 
     </main>
 
-    <div id="toast" class="toast">✅ 방문 신청 링크가 복사되었습니다!</div>
+    <!-- 공유 모달 -->
+    <div class="modal-overlay" id="shareModal" onclick="handleOverlayClick(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">🔗 방문 신청 링크 발송</span>
+                <button class="modal-close" onclick="closeShareModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-label">발송하시려는 분의 이메일 주소를 입력해 주세요.</p>
+                <div class="modal-input-row">
+                    <input
+                        type="email"
+                        id="shareEmailInput"
+                        class="modal-email-input"
+                        placeholder="example@email.com"
+                        onkeydown="if(event.key==='Enter') sendViaEmail()"
+                    >
+                    <button class="modal-send-btn" onclick="sendViaEmail()">발송하기</button>
+                </div>
+
+                <div class="modal-divider">또는</div>
+
+                <button class="modal-copy-btn" onclick="copyShareLink()">
+                    📋 &nbsp;링크 직접 복사하기
+                </button>
+                <p class="modal-hint">이메일 없이 링크를 직접 복사하여 전달하셔도 됩니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
 
     <script>
-        function copyRegisterLink() {
+        function getRegisterLink() {
             let currentUrl = window.location.href;
             if (currentUrl.endsWith('index.html')) {
                 currentUrl = currentUrl.replace('index.html', '');
@@ -367,21 +454,57 @@
             if (!currentUrl.endsWith('/')) {
                 currentUrl += '/';
             }
-            const registerLink = currentUrl + 'register.html';
+            return currentUrl + 'register.html';
+        }
 
-            navigator.clipboard.writeText(registerLink).then(() => {
-                showToast();
+        function openShareModal() {
+            document.getElementById('shareModal').classList.add('open');
+            setTimeout(() => document.getElementById('shareEmailInput').focus(), 100);
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('open');
+            document.getElementById('shareEmailInput').value = '';
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === document.getElementById('shareModal')) closeShareModal();
+        }
+
+        function sendViaEmail() {
+            const email = document.getElementById('shareEmailInput').value.trim();
+            if (!email) {
+                document.getElementById('shareEmailInput').focus();
+                return;
+            }
+            const link = getRegisterLink();
+            const subject = encodeURIComponent('[넷마블 방문예약] 방문 신청 링크 안내');
+            const body = encodeURIComponent(
+                '안녕하세요.\n\n넷마블 방문예약 링크를 안내드립니다.\n\n' +
+                '▶ 방문 신청 링크\n' + link + '\n\n' +
+                '위 링크를 클릭하시면 방문 신청 페이지로 이동합니다.\n' +
+                '방문 신청 후 담당자 승인을 거쳐 방문이 확정됩니다.\n\n' +
+                '감사합니다.\n넷마블 방문예약 시스템'
+            );
+            window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+            closeShareModal();
+        }
+
+        function copyShareLink() {
+            const link = getRegisterLink();
+            navigator.clipboard.writeText(link).then(() => {
+                closeShareModal();
+                showToast('✅ 방문 신청 링크가 복사되었습니다!');
             }).catch(err => {
                 alert('링크 복사에 실패했습니다: ' + err);
             });
         }
 
-        function showToast() {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
+            toast.textContent = msg;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
     </script>
 </body>
