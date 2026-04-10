@@ -158,25 +158,24 @@
         .admin-btn {
             display: block;
             width: 100%;
-            max-width: 460px;
-            background: var(--nm-white);
+            background: transparent;
             color: var(--nm-text-sub);
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(69,47,39,0.09);
-            padding: 1rem;
+            border: 1.5px solid var(--nm-border);
+            border-radius: 10px;
+            padding: 0.85rem;
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
             text-decoration: none;
-            margin-bottom: 0.9rem;
-            transition: background 0.2s, color 0.2s;
+            margin-top: 0.7rem;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
             text-align: center;
         }
         .admin-btn:hover {
-            background: #f2ebe7;
+            background: var(--nm-bg);
             color: var(--nm-brown-dark);
+            border-color: var(--nm-brown-light);
         }
 
         /* ─── 방문절차 영역 ─── */
