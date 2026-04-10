@@ -280,6 +280,114 @@ function buildCalendarUrl(v) {
 }
 
 // ──────────────────────────────────────────────
+// 승인 안내 이메일 HTML 템플릿 생성
+// ──────────────────────────────────────────────
+function buildApprovalEmailHtml(visit) {
+  const v = (s) => s || '-';
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f9f6f4;font-family:Arial,'Malgun Gothic','맑은 고딕',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f6f4;padding:32px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(69,47,39,0.10);">
+
+      <!-- 헤더 -->
+      <tr>
+        <td style="background:#452f27;padding:32px;text-align:center;">
+          <div style="color:#ffffff;font-size:28px;font-weight:bold;letter-spacing:-0.5px;">netmarble</div>
+          <div style="color:#c5ae9e;font-size:13px;margin-top:6px;letter-spacing:0.06em;">방문객 예약 관리 시스템</div>
+        </td>
+      </tr>
+
+      <!-- 승인 배지 -->
+      <tr>
+        <td style="padding:32px 40px 0;text-align:center;">
+          <span style="display:inline-block;background:#f0ebe7;color:#452f27;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:bold;">✅ &nbsp;방문 승인 완료</span>
+        </td>
+      </tr>
+
+      <!-- 인사말 -->
+      <tr>
+        <td style="padding:24px 40px 0;">
+          <h2 style="color:#2d1f1a;font-size:20px;margin:0 0 10px;font-weight:bold;">안녕하세요, ${v(visit.visitorName)}님.</h2>
+          <p style="color:#7a6560;font-size:14px;line-height:1.8;margin:0;">
+            넷마블 방문 신청이 <strong style="color:#452f27;">승인</strong>되었습니다.<br>
+            아래 방문 일정을 확인하시고, 방문 당일 1층 안내데스크에서 입실 수속을 진행해 주세요.
+          </p>
+          <div style="border-top:1px solid #e8ddd9;margin:24px 0 0;"></div>
+        </td>
+      </tr>
+
+      <!-- 방문 정보 -->
+      <tr>
+        <td style="padding:24px 40px 0;">
+          <div style="background:#f9f6f4;border-radius:10px;padding:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:9px 0;color:#7a6560;font-size:13px;width:110px;vertical-align:top;">📅&nbsp; 방문 일자</td>
+                <td style="padding:9px 0;color:#2d1f1a;font-size:13px;font-weight:bold;">${v(visit.visitDate)}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;color:#7a6560;font-size:13px;border-top:1px solid #e8ddd9;vertical-align:top;">⏰&nbsp; 방문 시간</td>
+                <td style="padding:9px 0;color:#2d1f1a;font-size:13px;font-weight:bold;border-top:1px solid #e8ddd9;">${v(visit.visitTimeSlot)}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;color:#7a6560;font-size:13px;border-top:1px solid #e8ddd9;vertical-align:top;">👤&nbsp; 담당자</td>
+                <td style="padding:9px 0;color:#2d1f1a;font-size:13px;font-weight:bold;border-top:1px solid #e8ddd9;">${v(visit.hostInfo ?? visit.hostName)}</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 0;color:#7a6560;font-size:13px;border-top:1px solid #e8ddd9;vertical-align:top;">📋&nbsp; 방문 목적</td>
+                <td style="padding:9px 0;color:#2d1f1a;font-size:13px;font-weight:bold;border-top:1px solid #e8ddd9;">${v(visit.visitPurpose)}</td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 방문 장소 -->
+      <tr>
+        <td style="padding:20px 40px 0;">
+          <div style="border-left:4px solid #452f27;padding:16px 20px;background:#faf8f7;border-radius:0 10px 10px 0;">
+            <div style="color:#452f27;font-size:13px;font-weight:bold;margin-bottom:6px;">📍 &nbsp;방문 장소</div>
+            <div style="color:#2d1f1a;font-size:13px;line-height:1.7;">
+              서울특별시 강남구 테헤란로 133<br>지타워 (G-Tower) 넷마블
+            </div>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 안내 문구 -->
+      <tr>
+        <td style="padding:20px 40px 32px;">
+          <p style="color:#7a6560;font-size:13px;line-height:1.7;margin:0;background:#fffdf9;border:1px solid #e8ddd9;border-radius:8px;padding:14px 16px;">
+            💡 &nbsp;방문 당일 신분증을 지참해 주시기 바랍니다.<br>
+            문의사항은 담당자에게 직접 연락해 주세요.
+          </p>
+        </td>
+      </tr>
+
+      <!-- 구분선 -->
+      <tr><td style="border-top:1px solid #f0ebe7;"></td></tr>
+
+      <!-- 푸터 -->
+      <tr>
+        <td style="padding:20px 40px;text-align:center;">
+          <p style="color:#c5ae9e;font-size:11px;margin:0;line-height:1.7;">
+            본 메일은 넷마블 방문예약 시스템에서 자동 발송된 메일입니다.<br>
+            ©2025 Netmarble Corp. All rights reserved.
+          </p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
+// ──────────────────────────────────────────────
 // 방문객 승인 알림 발송
 // (향후 SMS/카카오톡 전환 시 NOTIFICATION_CONFIG.channel 값과 이 함수만 수정)
 // ──────────────────────────────────────────────
@@ -297,6 +405,7 @@ async function sendApprovalNotification(visit) {
         purpose:     visit.visitPurpose,                  // 방문 목적
         hostInfo:    visit.hostInfo,                      // 담당자 정보
         subject:     `[넷마블 방문예약] 방문이 승인되었습니다. (${visit.visitDate})`, // 메일 제목
+        htmlBody:    buildApprovalEmailHtml(visit),       // HTML 이메일 본문 (GAS에서 사용)
       };
       await fetch(NOTIFICATION_CONFIG.gasUrl, {
         method:    'POST',
