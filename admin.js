@@ -244,10 +244,10 @@ async function handleParkingToggle(e) {
 
   try {
     if (entryBtn) {
-      await updateDoc(doc(db, 'visitRequests', id), { entryTime: now });
+      await updateDoc(doc(db, 'visitRequests', id), { entryTime: now, parkingRegisteredAt: now });
       const visit = allVisits.find(v => v.id === id);
-      if (visit) visit.entryTime = now;
-      showToast('입차 처리되었습니다.');
+      if (visit) { visit.entryTime = now; visit.parkingRegisteredAt = now; }
+      showToast('입차 및 주차 등록이 완료되었습니다.');
     } else if (registerBtn) {
       await updateDoc(doc(db, 'visitRequests', id), { parkingRegisteredAt: now });
       const visit = allVisits.find(v => v.id === id);
