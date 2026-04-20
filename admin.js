@@ -195,9 +195,26 @@ async function handleConfirmToggle(e) {
 
   btn.disabled = true;
   try {
-    await updateDoc(doc(db, 'visitRequests', id), { adminConfirmed: next });
+    const updateData = { adminConfirmed: next };
+
+    // 승인 시 QR 코드 생성, 취소 시 무효화
+    let qrCode = null;
+    if (next) {
+      qrCode = generateQRCode();
+      updateData.qrCode = qrCode;
+      updateData.qrIssuedAt = new Date().toISOString();
+      updateData.qrStatus = 'active';
+    } else {
+      updateData.qrStatus = 'revoked';
+    }
+
+    await updateDoc(doc(db, 'visitRequests', id), updateData);
     const visit = allVisits.find(v => v.id === id);
-    if (visit) visit.adminConfirmed = next;
+    if (visit) {
+      visit.adminConfirmed = next;
+      if (next) { visit.qrCode = qrCode; visit.qrStatus = 'active'; }
+      else { visit.qrStatus = 'revoked'; }
+    }
     btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
     btn.dataset.confirmed = String(next);
     btn.textContent = next ? '승인 완료' : '방문 승인하기';
