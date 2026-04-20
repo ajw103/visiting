@@ -388,6 +388,15 @@ function buildApprovalEmailHtml(visit) {
 }
 
 // ──────────────────────────────────────────────
+// QR 코드 생성 (13자리 숫자: 앞 7자리 타임스탬프 + 뒤 6자리 랜덤)
+// ──────────────────────────────────────────────
+function generateQRCode() {
+  const timestamp = String(Math.floor(Date.now() / 1000)).slice(0, 7);
+  const random = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+  return timestamp + random;
+}
+
+// ──────────────────────────────────────────────
 // 방문객 승인 알림 발송
 // (향후 SMS/카카오톡 전환 시 NOTIFICATION_CONFIG.channel 값과 이 함수만 수정)
 // ──────────────────────────────────────────────
