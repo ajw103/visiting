@@ -330,7 +330,7 @@ function buildApprovalEmailHtml(visit) {
           <h2 style="color:#2d1f1a;font-size:20px;margin:0 0 10px;font-weight:bold;">안녕하세요, ${v(visit.visitorName)}님.</h2>
           <p style="color:#7a6560;font-size:14px;line-height:1.8;margin:0;">
             넷마블 방문 신청이 <strong style="color:#452f27;">승인</strong>되었습니다.<br>
-            아래 방문 일정을 확인하시고, 방문 당일 1층 안내데스크에서 입실 수속을 진행해 주세요.
+            아래 방문 일정을 확인하시고, 방문 당일 QR 코드를 1층 스피드게이트에 태깅하여 입장해 주세요.
           </p>
           <div style="border-top:1px solid #e8ddd9;margin:24px 0 0;"></div>
         </td>
