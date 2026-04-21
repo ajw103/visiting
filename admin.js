@@ -554,7 +554,6 @@ function applyFilter(type = 'search') {
   const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
   
   const now = new Date();
-  const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000));
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7);
 
