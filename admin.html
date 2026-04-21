@@ -389,19 +389,17 @@
     /* 일반 담당자(role-staff) 전용 UI 최적화 */
     .role-staff #recordCount { display: none !important; }
     .role-staff table { min-width: auto; } /* 모바일에서 꽉 차게 보이도록 고정폭 제거 */
-    /* 일반 관리자: 입차(4), 출차(5), 담당직원(8), 상태(10), 회사명(11), 신청일시(12) 숨김 */
-    .role-staff table th:nth-child(4), .role-staff table td:nth-child(4) { display: none; } /* 입차시간 숨김 */
-    .role-staff table th:nth-child(5), .role-staff table td:nth-child(5) { display: none; } /* 출차시간 숨김 */
-    .role-staff table th:nth-child(8), .role-staff table td:nth-child(8) { display: none; } /* 담당직원 숨김 */
-    .role-staff table th:nth-child(10), .role-staff table td:nth-child(10) { display: none; } /* 상태 숨김 */
-    .role-staff table th:nth-child(11), .role-staff table td:nth-child(11) { display: none; } /* 회사명 숨김 */
-    .role-staff table th:nth-child(12), .role-staff table td:nth-child(12) { display: none; } /* 신청일시 숨김 */
+    /* 일반 담당자: 입차(4), 출차(5), 담당직원(8), 상태(10), 신청일시(11) 숨김 */
+    .role-staff table th:nth-child(4), .role-staff table td:nth-child(4) { display: none; }
+    .role-staff table th:nth-child(5), .role-staff table td:nth-child(5) { display: none; }
+    .role-staff table th:nth-child(8), .role-staff table td:nth-child(8) { display: none; }
+    .role-staff table th:nth-child(10), .role-staff table td:nth-child(10) { display: none; }
+    .role-staff table th:nth-child(11), .role-staff table td:nth-child(11) { display: none; }
 
-    /* 총관리자: 연락처(9), 상태(10), 회사명(11), 신청일시(12) 숨김, 회의실 예약 버튼 숨김 */
-    .role-super table th:nth-child(9), .role-super table td:nth-child(9) { display: none; } /* 연락처 숨김 */
-    .role-super table th:nth-child(10), .role-super table td:nth-child(10) { display: none; } /* 상태 숨김 */
-    .role-super table th:nth-child(11), .role-super table td:nth-child(11) { display: none; } /* 회사명 숨김 */
-    .role-super table th:nth-child(12), .role-super table td:nth-child(12) { display: none; } /* 신청일시 숨김 */
+    /* 총관리자: 연락처(9), 상태(10), 신청일시(11) 숨김, 회의실 예약 버튼 숨김 */
+    .role-super table th:nth-child(9), .role-super table td:nth-child(9) { display: none; }
+    .role-super table th:nth-child(10), .role-super table td:nth-child(10) { display: none; }
+    .role-super table th:nth-child(11), .role-super table td:nth-child(11) { display: none; }
     .role-super .room-booking-btn { display: none !important; }
 
     /* 모바일 환경 최적화 (768px 미만) */
