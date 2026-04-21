@@ -73,81 +73,69 @@ async function showDashboard() {
 }
 
 async function handleLogin() {
-    const name = document.getElementById('adminNameInput').value.trim();
-    const password = document.getElementById('adminEmpIdInput').value.trim();
-    const loginBtn = document.getElementById('adminLoginBtn');
+  const name = document.getElementById('adminNameInput').value.trim();
+  const password = document.getElementById('adminEmpIdInput').value.trim();
+  const loginBtn = document.getElementById('adminLoginBtn');
 
-    if (!name || !password) {
-        alert('성함과 비밀번호(사번)를 모두 입력해 주세요.');
-        return;
+  if (!name || !password) {
+    alert('성함과 비밀번호(사번)를 모두 입력해 주세요.');
+    return;
+  }
+
+  if (name === 'admin' && password === 'netmarble1!') {
+    sessionStorage.setItem('admin_authenticated', 'true');
+    sessionStorage.setItem('admin_role', 'super');
+    sessionStorage.setItem('admin_name', '총관리자');
+    showToast(`총관리자님, 환영합니다.`);
+    showDashboard();
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = '인증 중...';
+
+  try {
+    const q = query(collection(db, 'employees'), where('name', '==', name));
+    const snap = await getDocs(q);
+
+    let authenticated = false;
+    let empData = null;
+
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data.empId && data.empId.toUpperCase() === password.toUpperCase()) {
+        authenticated = true;
+        empData = data;
+      }
+    });
+
+    if (authenticated) {
+      sessionStorage.setItem('admin_authenticated', 'true');
+      sessionStorage.setItem('admin_role', 'staff');
+      sessionStorage.setItem('admin_name', name);
+      sessionStorage.setItem('admin_empId', empData.empId);
+      showToast(`${name} 담당자님, 환영합니다.`);
+      showDashboard();
+    } else {
+      alert('인증에 실패했습니다. 성함과 사번을 다시 확인해 주세요.');
     }
-
-    // 1. 총관리자 체크
-    if (name === 'admin' && password === 'netmarble1!') {
-        sessionStorage.setItem('admin_authenticated', 'true');
-        sessionStorage.setItem('admin_role', 'super');
-        sessionStorage.setItem('admin_name', '총관리자');
-        showToast(`총관리자님, 환영합니다.`);
-        showDashboard();
-        return;
-    }
-
-    // 2. 일반 담당자 체크 (사번 대소문자 미구분)
-    loginBtn.disabled = true;
-    loginBtn.textContent = '인증 중...';
-
-    try {
-        // 이름으로 먼저 검색
-        const q = query(
-            collection(db, 'employees'),
-            where('name', '==', name)
-        );
-        const snap = await getDocs(q);
-
-        let authenticated = false;
-        let empData = null;
-
-        snap.forEach(doc => {
-            const data = doc.data();
-            // 사번 비교 시 양쪽 모두 대문자로 변환하여 대소문자 미구분 처리
-            if (data.empId && data.empId.toUpperCase() === password.toUpperCase()) {
-                authenticated = true;
-                empData = data;
-            }
-        });
-
-        if (authenticated) {
-            sessionStorage.setItem('admin_authenticated', 'true');
-            sessionStorage.setItem('admin_role', 'staff');
-            sessionStorage.setItem('admin_name', name);
-            sessionStorage.setItem('admin_empId', empData.empId);
-            showToast(`${name} 담당자님, 환영합니다.`);
-            showDashboard();
-        } else {
-            alert('인증에 실패했습니다. 성함과 사번을 다시 확인해 주세요.');
-        }
-    } catch (err) {
-        console.error('Login Error:', err);
-        alert('인증 과정에서 오류가 발생했습니다.');
-    } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = '로그인';
-    }
+  } catch (err) {
+    console.error('Login Error:', err);
+    alert('인증 과정에서 오류가 발생했습니다.');
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = '로그인';
+  }
 }
 
 function handleLogout() {
-    if (confirm('로그아웃 하시겠습니까?')) {
-        // 모든 세션 정보 삭제
-        sessionStorage.clear();
-        
-        // 입력 필드 초기화
-        document.getElementById('adminNameInput').value = '';
-        document.getElementById('adminEmpIdInput').value = '';
-        
-        // 즉시 화면 전환 및 페이지 새로고침
-        showLogin();
-        window.location.replace(window.location.pathname);
-    }
+  if (confirm('로그아웃 하시겠습니까?')) {
+    sessionStorage.clear();
+    document.getElementById('adminNameInput').value = '';
+    document.getElementById('adminEmpIdInput').value = '';
+    showLogin();
+    window.location.replace(window.location.pathname);
+  }
 }
 
 function bindEvents() {
