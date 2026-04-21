@@ -422,16 +422,16 @@ async function sendApprovalNotification(visit) {
     if (NOTIFICATION_CONFIG.channel === 'email') {
       // 현재 채널: 이메일 (GAS를 통해 발송)
       const payload = {
-        type:        'approval',                          // GAS에서 승인 알림으로 구분하는 타입
-        to:          visit.visitorEmail,                  // 방문객 이메일
-        visitor:     visit.visitorName,                   // 방문객 성명
-        company:     visit.company,                       // 방문객 소속
-        date:        visit.visitDate,                     // 방문 예정 날짜
-        time:        visit.visitTimeSlot,                 // 방문 예정 시간
-        purpose:     visit.visitPurpose,                  // 방문 목적
-        hostInfo:    visit.hostInfo,                      // 담당자 정보
-        subject:     `[넷마블 방문예약] 방문이 승인되었습니다. (${visit.visitDate})`, // 메일 제목
-        htmlBody:    buildApprovalEmailHtml(visit),       // HTML 이메일 본문 (GAS에서 사용)
+        type:     'approval',
+        to:       visit.visitorEmail,
+        visitor:  visit.visitorName,
+        company:  visit.company,
+        date:     visit.visitDate,
+        time:     visit.visitTimeSlot,
+        purpose:  visit.visitPurpose,
+        hostInfo: visit.hostInfo,
+        subject:  `[넷마블 방문예약] 방문이 승인되었습니다. (${visit.visitDate})`,
+        htmlBody: buildApprovalEmailHtml(visit),
       };
       await fetch(NOTIFICATION_CONFIG.gasUrl, {
         method:    'POST',
