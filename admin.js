@@ -683,7 +683,6 @@ function renderTable() {
         <td>${esc(v.hostInfo ?? v.hostName) || '-'}</td>
         <td>${esc(v.contact)}</td>
         <td><span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span></td>
-        <td>${esc(v.company) || '-'}</td>
         <td>${formatDateTime(v.timestamp)}</td>
       </tr>
     `;
