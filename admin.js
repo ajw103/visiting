@@ -503,9 +503,6 @@ async function loadVisits() {
         });
     }
 
-    // 최신순 정렬 (이미 쿼리에 orderBy가 있지만, 혹시 모를 로컬 데이터 동기화를 위해 보장)
-    allVisits.sort((a, b) => (b.timestamp?.getTime() || 0) - (a.timestamp?.getTime() || 0));
-
     // 주차관제 API가 연결된 경우 입출차 데이터 동기화
     if (IS_API_CONNECTED) {
       await mergeParkingLogs();
