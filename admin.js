@@ -695,9 +695,8 @@ function renderTable() {
 // ──────────────────────────────────────────────
 function updateSummary() {
   const now = new Date();
-  const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // KST 기준 보정 (필요시)
   const todayStr = now.toISOString().split('T')[0];
-  const monthPrefix = todayStr.substring(0, 7); // YYYY-MM
+  const monthPrefix = todayStr.substring(0, 7);
 
   const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
   const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(monthPrefix));
