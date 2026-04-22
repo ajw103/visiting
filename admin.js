@@ -545,9 +545,10 @@ async function loadVisits() {
 // 주차관제 API 동기화 및 Firestore 업데이트
 // ──────────────────────────────────────────────
 async function mergeParkingLogs() {
+  // 에스원 API 연동 시: syncAllParkingLogs가 차량번호별 입출차 데이터를 반환
+  // log 구조에 carEntries 포함 시 아래 Firestore 업데이트에 carEntries도 함께 저장할 것
   const parkingMap = await syncAllParkingLogs(allVisits);
 
-  // API에서 받아온 입출차 시간을 메모리 목록과 Firestore에 반영
   for (const visit of allVisits) {
     const log = parkingMap.get(visit.id);
     if (!log) continue;
@@ -560,11 +561,10 @@ async function mergeParkingLogs() {
       visit.entryTime = log.entryTime;
       visit.exitTime  = log.exitTime;
 
-      // Firestore에도 저장 (다음번 로드 시 활용)
-      await updateDoc(doc(db, 'visitRequests', visit.id), {
-        entryTime: log.entryTime,
-        exitTime:  log.exitTime,
-      });
+      const updateData = { entryTime: log.entryTime, exitTime: log.exitTime };
+      // TODO(에스원 API 연동): log.carEntries가 있으면 함께 저장
+      // if (log.carEntries) updateData.carEntries = log.carEntries;
+      await updateDoc(doc(db, 'visitRequests', visit.id), updateData);
     }
   }
 }
