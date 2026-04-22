@@ -369,7 +369,6 @@ function buildApprovalEmailHtml(visit) {
             <div style="color:#452f27;font-size:13px;font-weight:bold;margin-bottom:4px;">📱 &nbsp;입장 QR 코드</div>
             <div style="color:#7a6560;font-size:12px;margin-bottom:16px;">1층 스피드게이트 QR 리더기에 태깅해 주세요.</div>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${visit.qrCode}" alt="입장 QR코드" width="180" height="180" style="display:block;margin:0 auto;border-radius:8px;" />
-            <div style="margin-top:12px;font-family:monospace;font-size:15px;font-weight:bold;color:#2d1f1a;letter-spacing:2px;">${visit.qrCode}</div>
           </div>
         </td>
       </tr>
