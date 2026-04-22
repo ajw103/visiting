@@ -656,12 +656,30 @@ function renderTable() {
       ? v.carPlates.filter(Boolean).join(', ')
       : (v.carPlate || '-');
     // 입차 셀: API 미연결 시 수동 입차 버튼, 입차 후 주차 등록 버튼 표시
+    // API 연동 시: IS_API_CONNECTED = true로 변경하면 아래 수동 UI 대신 API 데이터 표시
+    const cars = Array.isArray(v.carPlates) ? v.carPlates.filter(Boolean) : (v.carPlate ? [v.carPlate] : []);
     let entryCell;
     if (IS_API_CONNECTED) {
+      // API 연결 시: 에스원 API에서 받아온 입차 시간 표시 (per-car 지원 예정)
       entryCell = `<td class="time-cell ${v.entryTime ? 'has-time' : 'no-time'}">${v.entryTime ? formatDateTime(v.entryTime) : '<span class="awaiting">대기중</span>'}</td>`;
+    } else if (cars.length > 1) {
+      // 다중 차량: 차량별 개별 입차/주차등록 버튼
+      const rows = cars.map(plate => {
+        const entry = v.carEntries?.[plate];
+        if (!entry?.entryTime) {
+          return `<div style="margin:2px 0">${esc(plate)} <button class="parking-entry-btn" data-id="${v.id}" data-plate="${esc(plate)}">입차</button></div>`;
+        } else if (!entry?.parkingRegisteredAt) {
+          return `<div style="margin:2px 0">${esc(plate)} ${formatTime(new Date(entry.entryTime))} <button class="parking-register-btn" data-id="${v.id}" data-plate="${esc(plate)}">주차 등록</button></div>`;
+        } else {
+          return `<div style="margin:2px 0">${esc(plate)} <span class="parking-registered">✅ ${formatTime(new Date(entry.parkingRegisteredAt))}</span></div>`;
+        }
+      }).join('');
+      entryCell = `<td class="time-cell">${rows}</td>`;
     } else if (!v.entryTime) {
+      // 단일 차량: 입차 버튼
       entryCell = `<td class="time-cell no-time"><button class="parking-entry-btn" data-id="${v.id}">입차</button></td>`;
     } else {
+      // 단일 차량: 입차 후 주차 등록
       const parkingStatus = v.parkingRegisteredAt
         ? `<span class="parking-registered">✅ 주차등록 ${formatTime(v.parkingRegisteredAt)}</span>`
         : `<button class="parking-register-btn" data-id="${v.id}">주차 등록</button>`;
