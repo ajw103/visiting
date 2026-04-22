@@ -356,7 +356,7 @@ function buildApprovalEmailHtml(visit) {
           <div style="border-left:4px solid #452f27;padding:16px 20px;background:#faf8f7;border-radius:0 10px 10px 0;">
             <div style="color:#452f27;font-size:13px;font-weight:bold;margin-bottom:6px;">📍 &nbsp;방문 장소</div>
             <div style="color:#2d1f1a;font-size:13px;line-height:1.7;">
-              서울 구로구 디지털로26길 38<br>지타워 (G-Tower) 넷마블
+              서울 구로구 디지털로26길 38 지타워 (G-Tower) 넷마블
             </div>
           </div>
         </td>
