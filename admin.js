@@ -243,21 +243,45 @@ async function handleParkingToggle(e) {
   if (!entryBtn && !registerBtn) return;
 
   const btn = entryBtn || registerBtn;
-  const id  = btn.dataset.id;
-  const now = new Date();
+  const id    = btn.dataset.id;
+  const plate = btn.dataset.plate || null; // 다중 차량 시 특정 차량번호
+  const now   = new Date();
   btn.disabled = true;
 
   try {
-    if (entryBtn) {
-      await updateDoc(doc(db, 'visitRequests', id), { entryTime: now, parkingRegisteredAt: now });
-      const visit = allVisits.find(v => v.id === id);
-      if (visit) { visit.entryTime = now; visit.parkingRegisteredAt = now; }
-      showToast('입차 및 주차 등록이 완료되었습니다.');
-    } else if (registerBtn) {
-      await updateDoc(doc(db, 'visitRequests', id), { parkingRegisteredAt: now });
-      const visit = allVisits.find(v => v.id === id);
-      if (visit) visit.parkingRegisteredAt = now;
-      showToast('주차 등록이 완료되었습니다.');
+    const visit = allVisits.find(v => v.id === id);
+
+    if (plate) {
+      // 다중 차량: 특정 차량만 처리
+      const carEntries = { ...(visit?.carEntries || {}) };
+      if (entryBtn) {
+        carEntries[plate] = { entryTime: now.toISOString(), parkingRegisteredAt: now.toISOString() };
+        const updateData = { carEntries };
+        // 첫 입차 시 visit 레벨 entryTime도 기록 (상태 판단 및 API 연동 호환용)
+        if (!visit?.entryTime) updateData.entryTime = now;
+        await updateDoc(doc(db, 'visitRequests', id), updateData);
+        if (visit) {
+          visit.carEntries = carEntries;
+          if (!visit.entryTime) visit.entryTime = now;
+        }
+        showToast(`${plate} 입차 및 주차 등록이 완료되었습니다.`);
+      } else if (registerBtn) {
+        carEntries[plate] = { ...carEntries[plate], parkingRegisteredAt: now.toISOString() };
+        await updateDoc(doc(db, 'visitRequests', id), { carEntries });
+        if (visit) visit.carEntries = carEntries;
+        showToast(`${plate} 주차 등록이 완료되었습니다.`);
+      }
+    } else {
+      // 단일 차량: 기존 방식 유지
+      if (entryBtn) {
+        await updateDoc(doc(db, 'visitRequests', id), { entryTime: now, parkingRegisteredAt: now });
+        if (visit) { visit.entryTime = now; visit.parkingRegisteredAt = now; }
+        showToast('입차 및 주차 등록이 완료되었습니다.');
+      } else if (registerBtn) {
+        await updateDoc(doc(db, 'visitRequests', id), { parkingRegisteredAt: now });
+        if (visit) visit.parkingRegisteredAt = now;
+        showToast('주차 등록이 완료되었습니다.');
+      }
     }
     renderTable();
   } catch (err) {
