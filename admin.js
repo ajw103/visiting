@@ -605,21 +605,31 @@ function applyFilter(type = 'search') {
 // 상태 계산
 // ──────────────────────────────────────────────
 function getStatus(visit) {
-  if (visit.exitTime)  return 'exited';
+  if (visit.exitTime) return 'exited';
+
+  const cars = Array.isArray(visit.carPlates) ? visit.carPlates.filter(Boolean) : [];
+  if (cars.length > 1 && visit.carEntries) {
+    const enteredCount = cars.filter(p => visit.carEntries[p]?.entryTime).length;
+    if (enteredCount === cars.length) return 'entered';
+    if (enteredCount > 0) return 'partial';
+  }
+
   if (visit.entryTime) return 'entered';
   return 'pending';
 }
 
 const STATUS_LABEL = {
-  pending: '신청됨',
-  entered: '입차중',
-  exited:  '출차완료',
+  pending:  '신청됨',
+  partial:  '일부입차',
+  entered:  '입차중',
+  exited:   '출차완료',
 };
 
 const STATUS_CLASS = {
-  pending: 'status-pending',
-  entered: 'status-entered',
-  exited:  'status-exited',
+  pending:  'status-pending',
+  partial:  'status-partial',
+  entered:  'status-entered',
+  exited:   'status-exited',
 };
 
 // ──────────────────────────────────────────────
