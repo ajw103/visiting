@@ -429,6 +429,50 @@ function buildApprovalEmailHtml(visit) {
 }
 
 // ──────────────────────────────────────────────
+// 방문 초대 링크 생성
+// ──────────────────────────────────────────────
+function generateInviteToken() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  return Array.from({length: 24}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+async function createInvitation() {
+  const token = generateInviteToken();
+  // 생성일 포함 3일 유효 (48시간 후 만료: 23일 생성 → 25일 만료)
+  const expiresAt = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+  const createdBy = sessionStorage.getItem('admin_name') || 'admin';
+
+  await addDoc(collection(db, 'visitInvitations'), {
+    token,
+    createdAt: new Date(),
+    expiresAt,
+    createdBy,
+    used: false,
+  });
+
+  return token;
+}
+
+async function openInviteModal() {
+  const modal = document.getElementById('inviteModal');
+  const input = document.getElementById('inviteLinkInput');
+  const copyMsg = document.getElementById('inviteCopyMsg');
+
+  input.value = '링크 생성 중...';
+  copyMsg.textContent = '';
+  modal.classList.add('open');
+
+  try {
+    const token = await createInvitation();
+    const base = location.href.replace(/admin\.html.*$/, '');
+    input.value = `${base}register.html?token=${token}`;
+  } catch (err) {
+    console.error('초대 링크 생성 실패:', err);
+    input.value = '오류가 발생했습니다. 다시 시도해 주세요.';
+  }
+}
+
+// ──────────────────────────────────────────────
 // QR 코드 생성 (13자리 숫자: 앞 7자리 타임스탬프 + 뒤 6자리 랜덤)
 // ──────────────────────────────────────────────
 function generateQRCode() {
