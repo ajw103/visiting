@@ -178,11 +178,11 @@ function bindEvents() {
   document.getElementById('copyInviteLinkBtn').addEventListener('click', () => {
     const input = document.getElementById('inviteLinkInput');
     const msg = document.getElementById('inviteCopyMsg');
-    navigator.clipboard.writeText(input.value).catch(() => {
-      input.select();
-      document.execCommand('copy');
+    navigator.clipboard.writeText(input.value).then(() => {
+      msg.textContent = '✅ 링크가 복사되었습니다!';
+    }).catch(() => {
+      msg.textContent = '복사 실패. 직접 선택 후 Ctrl+C 해주세요.';
     });
-    msg.textContent = '✅ 링크가 복사되었습니다!';
   });
 }
 
