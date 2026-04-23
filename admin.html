@@ -636,6 +636,25 @@
   </main>
 </div>
 
+<!-- 방문 초대 링크 생성 모달 -->
+<div id="inviteModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:480px;">
+    <h3>🔗 방문 초대 링크 생성</h3>
+    <p style="color:var(--gray-600);font-size:0.9rem;margin:0.5rem 0 1.25rem;">
+      아래 링크를 방문객에게 전달하세요.<br>링크는 <strong>30일간 유효</strong>하며, <strong>1회 사용 후 만료</strong>됩니다.
+    </p>
+    <div style="display:flex;gap:0.5rem;">
+      <input type="text" id="inviteLinkInput" readonly
+        style="flex:1;padding:0.6rem 0.8rem;border:1px solid var(--gray-300);border-radius:6px;font-size:0.85rem;background:#f8f9fa;color:var(--gray-800);">
+      <button class="btn btn-primary" id="copyInviteLinkBtn">복사</button>
+    </div>
+    <p id="inviteCopyMsg" style="font-size:0.82rem;color:var(--success);margin:0.5rem 0 0;min-height:1.2em;"></p>
+    <div style="display:flex;justify-content:flex-end;margin-top:1.25rem;">
+      <button class="btn btn-outline" id="inviteModalCloseBtn">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 임직원 CSV 업로드 모달 -->
 <div id="empUploadModal" class="modal-overlay">
   <div class="modal-box">
