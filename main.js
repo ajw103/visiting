@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
 const TIME_SLOTS = [
     '09:00 ~ 10:00',
