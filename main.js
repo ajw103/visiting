@@ -412,6 +412,64 @@ class VisitorRegistrationForm extends HTMLElement {
 
         // 직원 데이터 로드 (이제 Firestore 실시간 쿼리를 사용하므로 초기 로드는 필요 없음)
         this._hosts = [];
+        this._token = null;
+        this._invitationDocId = null;
+    }
+
+    connectedCallback() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+
+        if (!token) {
+            this._blockForm('초대 링크를 통해서만 방문 신청이 가능합니다.<br>담당자에게 초대 링크를 요청해 주세요.');
+            return;
+        }
+
+        this._token = token;
+        this._validateToken(token);
+    }
+
+    async _validateToken(token) {
+        try {
+            const q = query(collection(db, 'visitInvitations'), where('token', '==', token));
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                this._blockForm('유효하지 않은 초대 링크입니다.<br>담당자에게 새로운 링크를 요청해 주세요.');
+                return;
+            }
+
+            const inviteDoc = snap.docs[0];
+            const data = inviteDoc.data();
+
+            if (data.used) {
+                this._blockForm('이미 사용된 초대 링크입니다.<br>담당자에게 새로운 링크를 요청해 주세요.');
+                return;
+            }
+
+            const expiresAt = data.expiresAt?.toDate?.() ?? null;
+            if (expiresAt && new Date() > expiresAt) {
+                this._blockForm('만료된 초대 링크입니다.<br>담당자에게 새로운 링크를 요청해 주세요.');
+                return;
+            }
+
+            // 유효한 토큰: 문서 ID 저장
+            this._invitationDocId = inviteDoc.id;
+        } catch (err) {
+            console.error('토큰 검증 오류:', err);
+            this._blockForm('링크 검증 중 오류가 발생했습니다.<br>잠시 후 다시 시도해 주세요.');
+        }
+    }
+
+    _blockForm(message) {
+        const container = this.shadowRoot.querySelector('.form-container');
+        container.innerHTML = `
+            <div style="text-align:center;padding:3rem 1.5rem;">
+                <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+                <h2 style="color:#343a40;margin-bottom:0.75rem;">접근 제한</h2>
+                <p style="color:#6c757d;line-height:1.7;">${message}</p>
+            </div>
+        `;
     }
 
     async _openModal() {
