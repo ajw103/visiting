@@ -9,6 +9,7 @@ import {
   query,
   where,
   orderBy,
+  addDoc,
 } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 import {
   IS_API_CONNECTED,
