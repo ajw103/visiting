@@ -166,6 +166,24 @@ function bindEvents() {
   if (todayCard) todayCard.addEventListener('click', () => applyFilter('today'));
   const monthCard = document.getElementById('monthCard');
   if (monthCard) monthCard.addEventListener('click', () => applyFilter('month'));
+
+  // 방문 초대 링크 모달
+  const inviteBtn = document.getElementById('inviteBtn');
+  if (inviteBtn) inviteBtn.addEventListener('click', openInviteModal);
+
+  document.getElementById('inviteModalCloseBtn').addEventListener('click', () => {
+    document.getElementById('inviteModal').classList.remove('open');
+  });
+
+  document.getElementById('copyInviteLinkBtn').addEventListener('click', () => {
+    const input = document.getElementById('inviteLinkInput');
+    const msg = document.getElementById('inviteCopyMsg');
+    navigator.clipboard.writeText(input.value).catch(() => {
+      input.select();
+      document.execCommand('copy');
+    });
+    msg.textContent = '✅ 링크가 복사되었습니다!';
+  });
 }
 
 async function handleConfirmToggle(e) {
