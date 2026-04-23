@@ -580,6 +580,14 @@ class VisitorRegistrationForm extends HTMLElement {
             const docRef = await addDoc(collection(db, 'visitRequests'), data);
             console.log('Document written with ID:', docRef.id);
 
+            // 초대 토큰 소모 처리 (1회 사용 후 만료)
+            if (this._invitationDocId) {
+                updateDoc(doc(db, 'visitInvitations', this._invitationDocId), {
+                    used: true,
+                    usedAt: new Date(),
+                }).catch(err => console.warn('토큰 소모 처리 실패:', err));
+            }
+
             // 담당자에게 실시간 알림 발송 (페이지 이동과 병렬로 처리)
             this._sendNotification(data);
         } catch (e) {
