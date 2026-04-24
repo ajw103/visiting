@@ -679,9 +679,9 @@
 
                 emailInput.disabled = true;
                 document.getElementById('sendSuccessMsg').style.display = 'block';
+                modalSentSuccess = true;
                 btn.textContent = '창 닫기';
                 btn.disabled = false;
-                btn.addEventListener('click', closeShareModal, { once: true });
             } catch (err) {
                 console.error('발송 오류:', err);
                 btn.textContent = '오류. 다시 시도';
