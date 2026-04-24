@@ -605,7 +605,13 @@
         document.getElementById('shareModal').addEventListener('click', e => {
             if (e.target === document.getElementById('shareModal')) closeShareModal();
         });
-        document.getElementById('modalSendBtn').addEventListener('click', sendViaEmail);
+        // 발송 성공 여부 플래그 (true일 때 버튼 클릭 = 창 닫기)
+        let modalSentSuccess = false;
+
+        document.getElementById('modalSendBtn').addEventListener('click', () => {
+            if (modalSentSuccess) closeShareModal();
+            else sendViaEmail();
+        });
         document.getElementById('copyLinkBtn').addEventListener('click', copyShareLink);
 
         function openShareModal() {
@@ -614,6 +620,7 @@
         }
 
         function closeShareModal() {
+            modalSentSuccess = false;
             document.getElementById('shareModal').classList.remove('open');
             document.getElementById('shareEmailInput').value = '';
             document.getElementById('shareEmailInput').disabled = false;
