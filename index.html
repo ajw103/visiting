@@ -605,8 +605,9 @@
         document.getElementById('shareModal').addEventListener('click', e => {
             if (e.target === document.getElementById('shareModal')) closeShareModal();
         });
-        // 발송 성공 여부 플래그 (true일 때 버튼 클릭 = 창 닫기)
-        let modalSentSuccess = false;
+        // 모달 상태 플래그
+        let modalSentSuccess = false; // true일 때 버튼 클릭 = 창 닫기
+        let sendInProgress = false;   // 발송 중 여부 (비동기 완료 후 UI 덮어쓰기 방지)
 
         document.getElementById('modalSendBtn').addEventListener('click', () => {
             if (modalSentSuccess) closeShareModal();
@@ -620,6 +621,7 @@
         }
 
         function closeShareModal() {
+            sendInProgress = false;    // 진행 중인 발송 취소
             modalSentSuccess = false;
             document.getElementById('shareModal').classList.remove('open');
             document.getElementById('shareEmailInput').value = '';
