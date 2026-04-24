@@ -575,6 +575,18 @@ class VisitorRegistrationForm extends HTMLElement {
             expireAt:      new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000), // 5년 후 자동 삭제
         };
 
+        // 사원정보 API 연동 후에는 담당자 미선택 시 제출 차단
+        if (IS_EMPLOYEE_API_CONNECTED && !data.hostInfo) {
+            const hostInput = this.shadowRoot.querySelector('#hostInfo');
+            hostInput.style.borderColor = '#dc3545';
+            hostInput.placeholder = '담당 직원을 반드시 선택해 주세요.';
+            setTimeout(() => {
+                hostInput.style.borderColor = '';
+                hostInput.placeholder = '*담당 직원의 성함을 입력해 주세요';
+            }, 3000);
+            return;
+        }
+
         btn.disabled = true;
         btn.textContent = '등록 중...';
 
