@@ -1,6 +1,9 @@
 import { db } from './firebase-config.js';
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
+// 사원정보 API 연동 완료 시 true로 변경
+const IS_EMPLOYEE_API_CONNECTED = false;
+
 const TIME_SLOTS = [
     '09:00 ~ 10:00',
     '10:00 ~ 11:00',
