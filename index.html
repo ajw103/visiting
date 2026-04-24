@@ -70,17 +70,19 @@
             font-weight: 700;
             letter-spacing: 0.02em;
         }
-        .header-admin-link {
+        .header-logout-btn {
+            background: none;
+            border: 1px solid var(--nm-brown-light);
             color: var(--nm-brown-light);
             font-size: 0.78rem;
-            text-decoration: none;
-            border: 1px solid var(--nm-brown-light);
             padding: 0.3rem 0.75rem;
             border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Noto Sans KR', sans-serif;
             opacity: 0.85;
             transition: opacity 0.15s;
         }
-        .header-admin-link:hover { opacity: 1; }
+        .header-logout-btn:hover { opacity: 1; color: var(--nm-white); border-color: var(--nm-white); }
 
         /* ─── 본문 ─── */
         .page-body {
@@ -112,7 +114,7 @@
             letter-spacing: 0.08em;
         }
 
-        /* ─── 통합 카드 ─── */
+        /* ─── 카드 ─── */
         .card {
             background: var(--nm-white);
             border-radius: 16px;
@@ -155,6 +157,7 @@
             letter-spacing: 0.04em;
         }
         .start-btn:hover { background: var(--nm-brown-mid); }
+        .start-btn:disabled { background: var(--nm-brown-light); cursor: not-allowed; }
 
         .admin-btn {
             display: block;
@@ -179,6 +182,37 @@
             border-color: var(--nm-brown-light);
         }
 
+        /* ─── 로그인 폼 ─── */
+        .login-input {
+            display: block;
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1.5px solid var(--nm-border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: var(--nm-text);
+            background: var(--nm-bg);
+            outline: none;
+            transition: border-color 0.15s;
+            margin-top: 0.75rem;
+        }
+        .login-input:first-of-type { margin-top: 0; }
+        .login-input:focus { border-color: var(--nm-brown-dark); background: var(--nm-white); }
+        .login-input::placeholder { color: var(--nm-brown-light); }
+        .login-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--nm-text);
+            margin-bottom: 1.25rem;
+        }
+        .login-error {
+            color: #c0392b;
+            font-size: 0.83rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
         /* ─── 방문절차 영역 ─── */
         .process-section {
             border-top: 1px solid var(--nm-border);
@@ -192,7 +226,6 @@
         }
         .card-header-icon { color: var(--nm-brown-dark); font-size: 1rem; }
         .card-header-title { font-size: 0.95rem; font-weight: 700; color: var(--nm-text); }
-
         .process-wrap {
             display: flex;
             align-items: center;
@@ -216,11 +249,7 @@
             font-size: 1.4rem;
             line-height: 1;
         }
-        .step-emoji {
-            display: block;
-            line-height: 1;
-            transform: translateY(0);
-        }
+        .step-emoji { display: block; line-height: 1; transform: translateY(0); }
         .step-label {
             font-size: 0.74rem;
             color: var(--nm-text-sub);
@@ -305,6 +334,7 @@
             transition: background 0.15s;
         }
         .modal-send-btn:hover { background: var(--nm-brown-mid); }
+        .modal-send-btn:disabled { background: var(--nm-brown-light); cursor: not-allowed; }
         .modal-divider {
             display: flex; align-items: center; gap: 0.8rem;
             margin: 1.2rem 0;
@@ -327,6 +357,7 @@
             transition: background 0.15s, border-color 0.15s;
         }
         .modal-copy-btn:hover { background: #f0ebe7; border-color: var(--nm-brown-light); }
+        .modal-copy-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .modal-hint {
             font-size: 0.76rem; color: var(--nm-brown-light);
             text-align: center; margin-top: 0.75rem; line-height: 1.5;
@@ -343,34 +374,27 @@
         }
         .toast.show { opacity: 1; }
 
-        /* ─── PC 반응형 (768px 이상) ─── */
+        /* ─── PC 반응형 ─── */
         @media (min-width: 768px) {
             .site-header { height: 64px; padding: 0 2.5rem; }
             .header-logo-text { font-size: 1.25rem; }
-            .header-admin-link { font-size: 0.88rem; padding: 0.4rem 1rem; }
-
+            .header-logout-btn { font-size: 0.88rem; padding: 0.4rem 1rem; }
             .page-body { padding: 4rem 2rem 5rem; }
-
             .company-logo-area { margin-bottom: 2.8rem; }
             .logo-main { font-size: 4rem; }
             .logo-sub { font-size: 1rem; margin-top: 0.6rem; }
-
             .card { max-width: 580px; border-radius: 20px; }
-
             .action-body { padding: 2.8rem 3rem 2.2rem; }
             .action-desc { font-size: 1.1rem; line-height: 1.8; }
             .action-desc strong { font-size: 1.2rem; }
             .start-btn { font-size: 1.15rem; padding: 1.2rem; margin-top: 1.6rem; border-radius: 12px; }
             .admin-btn { font-size: 1rem; padding: 0.95rem; border-radius: 12px; }
-
             .card-header { padding: 1.1rem 1.8rem; }
             .card-header-title { font-size: 1.05rem; }
-
             .process-wrap { padding: 1.8rem 1.2rem; }
             .step-circle { width: 70px; height: 70px; font-size: 1.8rem; }
             .step-label { font-size: 0.88rem; }
             .step-arrow { font-size: 1.4rem; margin-bottom: 2.2rem; }
-
             .modal-box { max-width: 500px; }
             .modal-body { padding: 2rem 1.8rem 1.8rem; }
             .modal-label { font-size: 0.92rem; }
@@ -385,86 +409,96 @@
     <!-- 헤더 -->
     <header class="site-header">
         <span class="header-logo-text">넷마블 방문예약</span>
+        <button id="logoutBtn" class="header-logout-btn" style="display:none;">로그아웃</button>
     </header>
 
-    <!-- 본문 -->
-    <main class="page-body">
-
-        <!-- 로고 -->
-        <div class="company-logo-area">
-            <div class="logo-main">netmarble</div>
-            <div class="logo-sub">방문객 예약 관리 시스템</div>
-        </div>
-
-        <!-- 통합 카드 -->
-        <div class="card">
-
-            <!-- 액션 영역 -->
-            <div class="action-body">
-                <p class="action-desc">
-                    방문객에게 신청 링크를 전달하시려면<br>
-                    아래 <strong>발송하기</strong> 버튼을 눌러주세요.
-                </p>
-                <button class="start-btn" onclick="openShareModal()">방문 신청 링크 발송하기</button>
-                <a href="admin.html" class="admin-btn">내 방문예약 보기</a>
+    <!-- 로그인 섹션 -->
+    <div id="loginSection" style="display:none;">
+        <main class="page-body">
+            <div class="company-logo-area">
+                <div class="logo-main">netmarble</div>
+                <div class="logo-sub">방문객 예약 관리 시스템</div>
             </div>
-
-        </div>
-
-        <!-- 방문 절차 안내 (별도 카드) -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-header-icon">🔑</span>
-                <span class="card-header-title">방문 절차 안내</span>
-            </div>
-            <div class="process-wrap">
-                <div class="process-step">
-                    <div class="step-circle"><span class="step-emoji">📝</span></div>
-                    <div class="step-label">방문신청</div>
-                </div>
-                <div class="step-arrow">›</div>
-                <div class="process-step">
-                    <div class="step-circle"><span class="step-emoji">✅</span></div>
-                    <div class="step-label">내부 승인</div>
-                </div>
-                <div class="step-arrow">›</div>
-                <div class="process-step">
-                    <div class="step-circle"><span class="step-emoji" style="transform: translateY(-6px)">🪪</span></div>
-                    <div class="step-label">방문수속</div>
-                </div>
-                <div class="step-arrow">›</div>
-                <div class="process-step">
-                    <div class="step-circle"><span class="step-emoji">🏢</span></div>
-                    <div class="step-label">입실</div>
+            <div class="card">
+                <div class="action-body">
+                    <p class="login-title">관리자 로그인</p>
+                    <input type="text" id="loginName" class="login-input" placeholder="성함" autocomplete="username">
+                    <input type="password" id="loginPw" class="login-input" placeholder="비밀번호 (사번)" autocomplete="current-password">
+                    <button id="loginBtn" class="start-btn">로그인</button>
+                    <p id="loginError" class="login-error">성함 또는 비밀번호를 확인해 주세요.</p>
                 </div>
             </div>
-        </div>
+        </main>
+    </div>
 
-    </main>
+    <!-- 메인 콘텐츠 (인증 후) -->
+    <div id="mainContent" style="display:none;">
+        <main class="page-body">
+            <div class="company-logo-area">
+                <div class="logo-main">netmarble</div>
+                <div class="logo-sub">방문객 예약 관리 시스템</div>
+            </div>
+
+            <div class="card">
+                <div class="action-body">
+                    <p class="action-desc">
+                        방문객에게 신청 링크를 전달하시려면<br>
+                        아래 <strong>발송하기</strong> 버튼을 눌러주세요.
+                    </p>
+                    <button class="start-btn" id="shareBtn">방문 신청 링크 발송하기</button>
+                    <a href="admin.html" class="admin-btn">내 방문예약 보기</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-icon">🔑</span>
+                    <span class="card-header-title">방문 절차 안내</span>
+                </div>
+                <div class="process-wrap">
+                    <div class="process-step">
+                        <div class="step-circle"><span class="step-emoji">📝</span></div>
+                        <div class="step-label">방문신청</div>
+                    </div>
+                    <div class="step-arrow">›</div>
+                    <div class="process-step">
+                        <div class="step-circle"><span class="step-emoji">✅</span></div>
+                        <div class="step-label">내부 승인</div>
+                    </div>
+                    <div class="step-arrow">›</div>
+                    <div class="process-step">
+                        <div class="step-circle"><span class="step-emoji" style="transform:translateY(-6px)">🪪</span></div>
+                        <div class="step-label">방문수속</div>
+                    </div>
+                    <div class="step-arrow">›</div>
+                    <div class="process-step">
+                        <div class="step-circle"><span class="step-emoji">🏢</span></div>
+                        <div class="step-label">입실</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <!-- 공유 모달 -->
-    <div class="modal-overlay" id="shareModal" onclick="handleOverlayClick(event)">
+    <div class="modal-overlay" id="shareModal">
         <div class="modal-box">
             <div class="modal-header">
                 <span class="modal-title">🔗 방문 신청 링크 발송</span>
-                <button class="modal-close" onclick="closeShareModal()">✕</button>
+                <button class="modal-close" id="modalCloseBtn">✕</button>
             </div>
             <div class="modal-body">
                 <p class="modal-label">링크를 받으시려는 분의 이메일 주소를 입력해 주세요.</p>
                 <div class="modal-input-row">
-                    <input
-                        type="email"
-                        id="shareEmailInput"
-                        class="modal-email-input"
-                        placeholder="example@email.com"
-                    >
-                    <button class="modal-send-btn" id="modalSendBtn" onclick="sendViaEmail()">발송하기</button>
+                    <input type="email" id="shareEmailInput" class="modal-email-input" placeholder="example@email.com">
+                    <button class="modal-send-btn" id="modalSendBtn">발송하기</button>
                 </div>
-                <p id="sendSuccessMsg" style="display:none; margin-top:0.8rem; font-size:0.88rem; color:#452f27; font-weight:700;">✅ 발송이 완료되었습니다.</p>
+                <p id="sendSuccessMsg" style="display:none;margin-top:0.8rem;font-size:0.88rem;color:#452f27;font-weight:700;">✅ 발송이 완료되었습니다.</p>
 
                 <div class="modal-divider">또는</div>
 
-                <button class="modal-copy-btn" onclick="copyShareLink()">
+                <button class="modal-copy-btn" id="copyLinkBtn">
                     📋 &nbsp;링크 직접 복사하기
                 </button>
                 <p class="modal-hint">이메일 없이 링크를 직접 복사하여 전달하셔도 됩니다.</p>
@@ -474,17 +508,105 @@
 
     <div id="toast" class="toast"></div>
 
-    <script>
-        function getRegisterLink() {
-            let currentUrl = window.location.href;
-            if (currentUrl.endsWith('index.html')) {
-                currentUrl = currentUrl.replace('index.html', '');
-            }
-            if (!currentUrl.endsWith('/')) {
-                currentUrl += '/';
-            }
-            return currentUrl + 'register.html';
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import {
+            collection, addDoc, getDocs, query, where
+        } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
+
+        // ── 초기 인증 체크 ──
+        if (sessionStorage.getItem('admin_authenticated') === 'true') {
+            showMain();
+        } else {
+            showLogin();
         }
+
+        function showLogin() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+
+        function showMain() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+
+        // ── 로그인 ──
+        document.getElementById('loginBtn').addEventListener('click', handleLogin);
+        document.getElementById('loginPw').addEventListener('keydown', e => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        async function handleLogin() {
+            const name = document.getElementById('loginName').value.trim();
+            const pw   = document.getElementById('loginPw').value.trim();
+            const errEl = document.getElementById('loginError');
+            const btn   = document.getElementById('loginBtn');
+
+            errEl.style.display = 'none';
+            if (!name || !pw) { errEl.style.display = 'block'; return; }
+
+            // 총관리자 계정
+            if (name === 'admin' && pw === 'netmarble1!') {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                sessionStorage.setItem('admin_role', 'super');
+                sessionStorage.setItem('admin_name', '총관리자');
+                showMain();
+                return;
+            }
+
+            // 임직원 인증 (Firestore)
+            btn.disabled = true;
+            btn.textContent = '인증 중...';
+            try {
+                const q = query(collection(db, 'employees'), where('name', '==', name));
+                const snap = await getDocs(q);
+                let found = false;
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.empId && data.empId.toUpperCase() === pw.toUpperCase()) {
+                        found = true;
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                        sessionStorage.setItem('admin_role', 'staff');
+                        sessionStorage.setItem('admin_name', name);
+                        sessionStorage.setItem('admin_empId', data.empId);
+                    }
+                });
+                if (found) {
+                    showMain();
+                } else {
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('로그인 오류:', err);
+                errEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요.';
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '로그인';
+            }
+        }
+
+        // ── 로그아웃 ──
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                sessionStorage.clear();
+                showLogin();
+            }
+        });
+
+        // ── 공유 모달 ──
+        document.getElementById('shareBtn').addEventListener('click', openShareModal);
+        document.getElementById('modalCloseBtn').addEventListener('click', closeShareModal);
+        document.getElementById('shareModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('shareModal')) closeShareModal();
+        });
+        document.getElementById('modalSendBtn').addEventListener('click', sendViaEmail);
+        document.getElementById('copyLinkBtn').addEventListener('click', copyShareLink);
 
         function openShareModal() {
             document.getElementById('shareModal').classList.add('open');
@@ -498,54 +620,89 @@
             document.getElementById('sendSuccessMsg').style.display = 'none';
             const btn = document.getElementById('modalSendBtn');
             btn.textContent = '발송하기';
-            btn.onclick = sendViaEmail;
             btn.disabled = false;
         }
 
-        function handleOverlayClick(e) {
-            if (e.target === document.getElementById('shareModal')) closeShareModal();
+        // ── 토큰 생성 ──
+        function generateInviteToken() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            return Array.from({length: 24}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
         }
 
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
+        async function createInvitation() {
+            const token = generateInviteToken();
+            // 생성일 포함 3일 유효 (48시간 후 만료)
+            const expiresAt = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+            const createdBy = sessionStorage.getItem('admin_name') || 'admin';
+            await addDoc(collection(db, 'visitInvitations'), {
+                token,
+                createdAt: new Date(),
+                expiresAt,
+                createdBy,
+                used: false,
+            });
+            return token;
+        }
 
-        function sendViaEmail() {
+        function getTokenLink(token) {
+            const base = location.href.replace(/index\.html.*$/, '').replace(/\/?$/, '/');
+            return `${base}register.html?token=${token}`;
+        }
+
+        // ── 이메일 발송 ──
+        async function sendViaEmail() {
             const emailInput = document.getElementById('shareEmailInput');
             const email = emailInput.value.trim();
-            if (!email) {
-                emailInput.focus();
-                return;
-            }
-            const link = getRegisterLink();
+            if (!email) { emailInput.focus(); return; }
+
             const btn = document.getElementById('modalSendBtn');
+            btn.disabled = true;
+            btn.textContent = '생성 중...';
 
-            fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'shareLink',
-                    to: email,
-                    link: link
-                })
-            });
+            try {
+                const token = await createInvitation();
+                const link  = getTokenLink(token);
 
-            emailInput.disabled = true;
-            document.getElementById('sendSuccessMsg').style.display = 'block';
-            btn.textContent = '창 닫기';
-            btn.onclick = closeShareModal;
-            btn.disabled = false;
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'shareLink', to: email, link }),
+                });
+
+                emailInput.disabled = true;
+                document.getElementById('sendSuccessMsg').style.display = 'block';
+                btn.textContent = '창 닫기';
+                btn.disabled = false;
+                btn.addEventListener('click', closeShareModal, { once: true });
+            } catch (err) {
+                console.error('발송 오류:', err);
+                btn.textContent = '오류. 다시 시도';
+                btn.disabled = false;
+            }
         }
 
-        function copyShareLink() {
-            const link = getRegisterLink();
-            navigator.clipboard.writeText(link).then(() => {
+        // ── 링크 복사 ──
+        async function copyShareLink() {
+            const btn = document.getElementById('copyLinkBtn');
+            btn.disabled = true;
+            btn.textContent = '링크 생성 중...';
+
+            try {
+                const token = await createInvitation();
+                const link  = getTokenLink(token);
+                await navigator.clipboard.writeText(link);
                 closeShareModal();
-                showToast('✅ 방문 신청 링크가 복사되었습니다!');
-            }).catch(err => {
-                alert('링크 복사에 실패했습니다: ' + err);
-            });
+                showToast('✅ 초대 링크가 복사되었습니다!');
+            } catch (err) {
+                console.error('복사 오류:', err);
+                showToast('복사에 실패했습니다. 다시 시도해 주세요.');
+                btn.disabled = false;
+                btn.textContent = '📋 \u00a0링크 직접 복사하기';
+            }
         }
 
+        // ── 토스트 ──
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
