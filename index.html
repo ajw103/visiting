@@ -665,13 +665,17 @@
             if (!email) { emailInput.focus(); return; }
 
             const btn = document.getElementById('modalSendBtn');
+            sendInProgress = true;
             btn.disabled = true;
             btn.textContent = '생성 중...';
 
             try {
                 const token = await createInvitation();
-                const link  = getTokenLink(token);
 
+                // 토큰 생성 도중 모달이 닫혔으면 UI 업데이트 중단
+                if (!sendInProgress) return;
+
+                const link = getTokenLink(token);
                 fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -681,11 +685,13 @@
 
                 emailInput.disabled = true;
                 document.getElementById('sendSuccessMsg').style.display = 'block';
+                sendInProgress = false;
                 modalSentSuccess = true;
                 btn.textContent = '창 닫기';
                 btn.disabled = false;
             } catch (err) {
                 console.error('발송 오류:', err);
+                sendInProgress = false;
                 btn.textContent = '오류. 다시 시도';
                 btn.disabled = false;
             }
