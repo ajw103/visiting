@@ -435,7 +435,7 @@ function buildApprovalEmailHtml(visit) {
       <tr>
         <td style="padding:20px 40px 32px;">
           <p style="color:#7a6560;font-size:13px;line-height:1.7;margin:0;background:#fffdf9;border:1px solid #e8ddd9;border-radius:8px;padding:14px 16px;">
-            💡 &nbsp;방문 당일 신분증을 지참해 주시기 바랍니다.<br>
+            💡 &nbsp;방문 당일 신분증 또는 명함을 지참해 주시기 바랍니다.<br>
             문의사항은 담당자에게 직접 연락해 주세요.
           </p>
         </td>
