@@ -13,6 +13,11 @@ import {
   IS_API_CONNECTED,
   syncAllParkingLogs,
 } from './parking-api.js';
+import {
+  IS_ACCESS_API_CONNECTED,
+  registerVisitorCard,
+  revokeVisitorCard,
+} from './access-api.js';
 
 // ──────────────────────────────────────────────
 // 알림 설정 (향후 SMS/카카오톡으로 전환 시 이 부분만 수정)
