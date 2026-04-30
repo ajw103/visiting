@@ -661,8 +661,6 @@ function applyFilter(type = 'search') {
   const role = sessionStorage.getItem('admin_role');
 
   filteredVisits = allVisits.filter(v => {
-    // 총관리자는 승인된 건만 표시
-    if (role === 'super' && !v.adminConfirmed) return false;
 
     // 1. 기간 필터링
     if (type === 'today') {
