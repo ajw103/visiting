@@ -196,25 +196,32 @@ async function handleConfirmToggle(e) {
 
   btn.disabled = true;
   try {
+    const visit = allVisits.find(v => v.id === id);
     const updateData = { adminConfirmed: next };
 
-    // 승인 시 QR 코드 생성, 취소 시 무효화
+    // 승인 시 QR 코드 생성 + 당일 자정 만료 설정, 취소 시 무효화
     let qrCode = null;
     if (next) {
       qrCode = generateQRCode();
       updateData.qrCode = qrCode;
       updateData.qrIssuedAt = new Date().toISOString();
       updateData.qrStatus = 'active';
+      // 방문 당일 자정(다음날 00:00 KST) 만료
+      if (visit?.visitDate) {
+        const expiry = new Date(`${visit.visitDate}T00:00:00+09:00`);
+        expiry.setDate(expiry.getDate() + 1);
+        updateData.qrExpiresAt = expiry.toISOString();
+      }
     } else {
       updateData.qrStatus = 'revoked';
+      updateData.qrExpiresAt = null;
     }
 
     await updateDoc(doc(db, 'visitRequests', id), updateData);
-    const visit = allVisits.find(v => v.id === id);
     if (visit) {
       visit.adminConfirmed = next;
-      if (next) { visit.qrCode = qrCode; visit.qrStatus = 'active'; }
-      else { visit.qrStatus = 'revoked'; }
+      if (next) { visit.qrCode = qrCode; visit.qrStatus = 'active'; visit.qrExpiresAt = updateData.qrExpiresAt; }
+      else { visit.qrStatus = 'revoked'; visit.qrExpiresAt = null; }
     }
     btn.className = `confirm-toggle ${next ? 'confirmed' : 'unconfirmed'}`;
     btn.dataset.confirmed = String(next);
