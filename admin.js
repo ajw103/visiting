@@ -251,6 +251,15 @@ async function handleConfirmToggle(e) {
     if (next === true && visit?.visitorEmail) {
       sendApprovalNotification(visit);
     }
+
+    // 에스원 출입 시스템 연동 (IS_ACCESS_API_CONNECTED = true 시 자동 처리)
+    if (IS_ACCESS_API_CONNECTED) {
+      if (next && visit) {
+        registerVisitorCard(visit);   // 승인 시 QR 카드 등록
+      } else if (!next && visit?.qrCode) {
+        revokeVisitorCard(visit.qrCode); // 취소 시 QR 카드 삭제
+      }
+    }
   } catch (err) {
     console.error(err);
     showToast('업데이트 실패. 다시 시도해 주세요.', 'error');
