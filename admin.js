@@ -658,8 +658,6 @@ function applyFilter(type = 'search') {
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7);
 
-  const role = sessionStorage.getItem('admin_role');
-
   filteredVisits = allVisits.filter(v => {
 
     // 1. 기간 필터링
