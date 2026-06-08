@@ -534,10 +534,28 @@ class VisitorRegistrationForm extends HTMLElement {
             let found = null;
 
             if (IS_EMPLOYEE_API_CONNECTED) {
-                // TODO: 실제 사원정보 API 호출 (nbs.nmn.io 연동 후 이 부분 구현)
-                // const res = await fetch(`${EMPLOYEE_API_URL}/search?name=${encodeURIComponent(name)}&dept=${encodeURIComponent(dept)}`);
-                // const data = await res.json();
-                // found = data.employee || null;
+                // 사원정보 API 호출 (nbs-api.nmn.io)
+                const params = new URLSearchParams({ compid: 'NM', deptnm: dept, usernm: name });
+                const res = await fetch(
+                    `${EMPLOYEE_API_BASE}/api-manager/rest/emp/lite?${params}`,
+                    { method: 'GET', headers: { 'xapikey': EMPLOYEE_API_KEY } }
+                );
+
+                if (!res.ok) throw new Error(`API 오류: ${res.status}`);
+                const json = await res.json();
+
+                if (json.resultType === 'SUCCESS' && Array.isArray(json.content) && json.content.length > 0) {
+                    const matched = json.content.find(e =>
+                        e.usernm === name &&
+                        e.deptnm?.includes(dept) &&
+                        e.usergb === 'Y'   // 재직중 여부 확인
+                    );
+                    found = matched
+                        ? { empId: matched.emp_id, email: matched.mailid, name: matched.usernm, dept: matched.deptnm }
+                        : null;
+                } else {
+                    found = null;
+                }
             } else {
                 // Firestore employees 컬렉션 조회 (API 연동 전 fallback)
                 if (!this._employeeCache) {
