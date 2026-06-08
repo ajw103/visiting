@@ -549,7 +549,8 @@ class VisitorRegistrationForm extends HTMLElement {
                 item.addEventListener('click', () => {
                     const h = matched[item.dataset.index];
                     const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
-                    this.shadowRoot.querySelector('#hostInfo').value = `${h.dept}${pos} ${h.name}`;
+                    this.shadowRoot.querySelector('#hostDept').value = `${h.dept}${pos}`;
+                                    this.shadowRoot.querySelector('#hostName').value = h.name;
                     this._selectedHostEmpId = h.empId;
                     this._selectedHostEmail = h.email;
                     this._closeModal();
