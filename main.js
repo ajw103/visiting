@@ -493,64 +493,75 @@ class VisitorRegistrationForm extends HTMLElement {
         `;
     }
 
-    async _openModal() {
-        this.shadowRoot.querySelector('#hostModal').classList.add('show');
-        this.shadowRoot.querySelector('#hostSearchInput').value = '';
-        this.shadowRoot.querySelector('#hostSearchResults').innerHTML = '<div class="no-result">성명 또는 부서를 입력하세요.</div>';
-        setTimeout(() => this.shadowRoot.querySelector('#hostSearchInput').focus(), 100);
-
-        // 직원 목록 캐시 (모달 열 때 한 번만 로드)
-        if (!this._employeeCache) {
-            try {
-                const snapshot = await getDocs(collection(db, 'employees'));
-                this._employeeCache = snapshot.docs.map(d => d.data());
-            } catch (e) {
-                console.error('직원 목록 로드 오류:', e);
-                this._employeeCache = [];
-            }
-        }
+    _resetVerification() {
+        this._hostVerified = false;
+        this._selectedHostEmpId = null;
+        this._selectedHostEmail = null;
+        const btn = this.shadowRoot.querySelector('#openHostSearchBtn');
+        btn.textContent = '직원 검색';
+        btn.className = 'search-host-btn';
+        btn.disabled = false;
     }
 
-    _closeModal() {
-        this.shadowRoot.querySelector('#hostModal').classList.remove('show');
-    }
+    async _verifyHost() {
+        const dept = this.shadowRoot.querySelector('#hostDept').value.trim();
+        const name = this.shadowRoot.querySelector('#hostName').value.trim();
+        const btn = this.shadowRoot.querySelector('#openHostSearchBtn');
 
-    _searchHost() {
-        const queryStr = this.shadowRoot.querySelector('#hostSearchInput').value.trim();
-        const resultsContainer = this.shadowRoot.querySelector('#hostSearchResults');
-
-        if (!queryStr) {
-            resultsContainer.innerHTML = '<div class="no-result">성명 또는 부서를 입력하세요.</div>';
+        // 두 칸 모두 입력 필요
+        if (!dept || !name) {
+            if (!dept) this.shadowRoot.querySelector('#hostDept').style.borderColor = '#dc3545';
+            if (!name) this.shadowRoot.querySelector('#hostName').style.borderColor = '#dc3545';
+            setTimeout(() => {
+                this.shadowRoot.querySelector('#hostDept').style.borderColor = '';
+                this.shadowRoot.querySelector('#hostName').style.borderColor = '';
+            }, 2000);
             return;
         }
 
-        const employees = this._employeeCache || [];
-        const matched = employees.filter(h => h.name === queryStr);
+        btn.textContent = '조회 중...';
+        btn.disabled = true;
+        btn.className = 'search-host-btn';
 
-        if (matched.length === 0) {
-            resultsContainer.innerHTML = '<div class="no-result">일치하는 직원이 없습니다.</div>';
-        } else {
-            resultsContainer.innerHTML = matched.map((h, i) => {
-                const positionDisplay = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
-                return `
-                    <div class="result-item" data-index="${i}">
-                        <span class="result-dept">${h.dept}${positionDisplay}</span>
-                        <span class="result-name">${h.name}</span>
-                    </div>
-                `;
-            }).join('');
+        try {
+            let found = null;
 
-            resultsContainer.querySelectorAll('.result-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const h = matched[item.dataset.index];
-                    const pos = h.position && h.position !== '팀원' ? ` ${h.position}` : '';
-                    this.shadowRoot.querySelector('#hostDept').value = `${h.dept}${pos}`;
-                                    this.shadowRoot.querySelector('#hostName').value = h.name;
-                    this._selectedHostEmpId = h.empId;
-                    this._selectedHostEmail = h.email;
-                    this._closeModal();
-                });
-            });
+            if (IS_EMPLOYEE_API_CONNECTED) {
+                // TODO: 실제 사원정보 API 호출 (nbs.nmn.io 연동 후 이 부분 구현)
+                // const res = await fetch(`${EMPLOYEE_API_URL}/search?name=${encodeURIComponent(name)}&dept=${encodeURIComponent(dept)}`);
+                // const data = await res.json();
+                // found = data.employee || null;
+            } else {
+                // Firestore employees 컬렉션 조회 (API 연동 전 fallback)
+                if (!this._employeeCache) {
+                    const snapshot = await getDocs(collection(db, 'employees'));
+                    this._employeeCache = snapshot.docs.map(d => d.data());
+                }
+                found = this._employeeCache.find(h =>
+                    h.name === name && (h.dept === dept || h.dept?.includes(dept))
+                ) || null;
+            }
+
+            if (found) {
+                btn.textContent = '✅ 확인 완료';
+                btn.className = 'search-host-btn verified';
+                this._hostVerified = true;
+                this._selectedHostEmpId = found.empId || null;
+                this._selectedHostEmail = found.email || null;
+            } else {
+                btn.textContent = '확인 불가';
+                btn.className = 'search-host-btn unverified';
+                this._hostVerified = false;
+                this._selectedHostEmpId = null;
+                this._selectedHostEmail = null;
+            }
+        } catch (err) {
+            console.error('직원 조회 오류:', err);
+            btn.textContent = '오류. 다시 시도';
+            btn.className = 'search-host-btn';
+            this._hostVerified = false;
+        } finally {
+            btn.disabled = false;
         }
     }
 
