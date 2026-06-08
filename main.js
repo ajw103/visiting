@@ -211,6 +211,26 @@ class VisitorRegistrationForm extends HTMLElement {
                 color: #495057;
             }
 
+            .host-input-row {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            .host-input-row input { flex: 1; min-width: 0; }
+            .search-host-btn {
+                flex-shrink: 0;
+                padding: 0.75rem 0.85rem;
+                background: none;
+                border: 1px solid var(--light-gray, #e9ecef);
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.85rem;
+                color: var(--primary-color, #007bff);
+                white-space: nowrap;
+                font-family: inherit;
+            }
+            .search-host-btn:hover { background: #e7f1ff; border-color: var(--primary-color, #007bff); }
+
             @media (max-width: 480px) {
                 .form-container {
                     padding: 1.5rem;
