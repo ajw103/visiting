@@ -228,8 +228,22 @@ class VisitorRegistrationForm extends HTMLElement {
                 color: var(--primary-color, #007bff);
                 white-space: nowrap;
                 font-family: inherit;
+                transition: background 0.15s, border-color 0.15s, color 0.15s;
             }
-            .search-host-btn:hover { background: #e7f1ff; border-color: var(--primary-color, #007bff); }
+            .search-host-btn:hover:not(:disabled) { background: #e7f1ff; border-color: var(--primary-color, #007bff); }
+            .search-host-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+            .search-host-btn.verified {
+                background: #d4edda;
+                border-color: #28a745;
+                color: #155724;
+                font-weight: bold;
+            }
+            .search-host-btn.unverified {
+                background: #f8d7da;
+                border-color: #dc3545;
+                color: #721c24;
+                font-weight: bold;
+            }
 
             @media (max-width: 480px) {
                 .form-container {
