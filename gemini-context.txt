@@ -1,0 +1,545 @@
+================================================================
+넷마블 방문객 관리 시스템 — Gemini 공유용 코드 컨텍스트
+================================================================
+
+## 시스템 개요
+- 넷마블 방문객 사전 예약 + 출입/주차 관리 웹 시스템
+- 배포: https://visiting-29c.pages.dev (Cloudflare Pages, 정적 SPA)
+- DB: Firebase Firestore (Project ID: nm-dev-gb-vertexai-ga)
+- 알림: Google Apps Script (이메일 발송)
+- 인증: 현재 하드코딩(admin/netmarble1!) → Okta SSO 연동 예정
+
+## 페이지 구조
+- index.html   : 담당자 로그인 + 초대 링크 생성/발송
+- register.html: 방문객 신청 폼 (초대 토큰 필수)
+- admin.html   : 관리자 대시보드 (방문 목록, 승인, 주차 관리)
+- complete.html: 신청 완료 페이지
+
+## Firestore 컬렉션 스키마
+
+### visitRequests (방문 신청)
+{
+  visitorName: string,       // 방문객 성명
+  company: string,           // 소속 회사
+  contact: string,           // 연락처
+  visitorEmail: string|null, // 방문객 이메일 (선택)
+  carPlates: string[],       // 차량번호 배열 (다중 차량 지원)
+  visitDate: string,         // "2026-06-08" 형식
+  visitTimeSlot: string,     // "14:00" 형식
+  visitPurpose: string,      // 회의|면접|정기점검|기타 방문
+  hostInfo: string,          // 담당 직원 정보 (부서 + 성명)
+  hostEmpId: string,         // 담당 직원 사번
+  timestamp: Timestamp,      // 신청 일시
+  adminConfirmed: boolean,   // 관리자 승인 여부
+  qrCode: string,            // 13자리 QR 코드 숫자 (승인 시 생성)
+  qrStatus: 'active'|'revoked',
+  qrIssuedAt: string,        // ISO 문자열
+  qrExpiresAt: string,       // 방문일 자정 만료
+  entryTime: Timestamp|null, // 입차 시간
+  exitTime: Timestamp|null,  // 출차 시간
+  parkingRegisteredAt: Timestamp|null,
+  carEntries: {              // 다중 차량 입차 추적
+    [차량번호]: { entryTime: string, parkingRegisteredAt: string }
+  }
+}
+
+### employees (임직원 정보) — 현재 비어있음, API 연동 예정
+{
+  name: string,
+  empId: string,   // 사번
+  dept: string,    // 부서
+  position: string,
+  email: string,
+  contact: string
+}
+
+### visitInvitations (초대 토큰)
+{
+  token: string,      // 24자리 영숫자
+  createdAt: Timestamp,
+  expiresAt: Timestamp,  // 생성일 포함 3일 (48시간 후 만료)
+  createdBy: string,
+  used: boolean,
+  usedAt: Timestamp|null
+}
+
+================================================================
+FILE: firebase-config.js
+================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDRRORZeAxarCsaziQzbfiUtbxNlM8OIgY",
+  authDomain: "nm-dev-gb-vertexai-ga.firebaseapp.com",
+  projectId: "nm-dev-gb-vertexai-ga",
+  storageBucket: "nm-dev-gb-vertexai-ga.firebasestorage.app",
+  messagingSenderId: "875291608176",
+  appId: "1:875291608176:web:82d79794fd900abccee0b5",
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+
+================================================================
+FILE: parking-api.js  (주차관제 API 연동 모듈 — 현재 미연결)
+================================================================
+// IS_API_CONNECTED = false 상태. 연동 정보 받으면 CONFIG 채우고 true로 변경.
+
+export const PARKING_API_CONFIG = {
+  baseUrl: 'https://YOUR_PARKING_API_URL',
+  apiKey: 'YOUR_API_KEY',
+  endpoints: {
+    getVehicleLog:  '/vehicle/log',
+    getAllLogs:      '/vehicle/logs',
+    getCurrentIn:   '/vehicle/current',
+  }
+};
+
+export const IS_API_CONNECTED = false;
+
+// 차량번호 + 방문날짜로 입출차 기록 단건 조회
+export async function fetchVehicleLog(carPlate, visitDate) {
+  if (!IS_API_CONNECTED) return { entryTime: null, exitTime: null };
+  // TODO: 실제 API 호출 코드 (주석 해제)
+  /*
+  const response = await fetch(
+    `${PARKING_API_CONFIG.baseUrl}${PARKING_API_CONFIG.endpoints.getVehicleLog}`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${PARKING_API_CONFIG.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ carPlate, date: visitDate }),
+    }
+  );
+  const data = await response.json();
+  return {
+    entryTime: data.entryTime ? new Date(data.entryTime) : null,
+    exitTime:  data.exitTime  ? new Date(data.exitTime)  : null,
+  };
+  */
+  return { entryTime: null, exitTime: null };
+}
+
+// 전체 방문 신청 목록 일괄 조회
+export async function syncAllParkingLogs(visitList) {
+  if (!IS_API_CONNECTED) return new Map();
+  // TODO: 일괄 조회 API 호출
+  /*
+  const results = new Map();
+  await Promise.all(
+    visitList.filter(v => v.carPlate).map(async (v) => {
+      const log = await fetchVehicleLog(v.carPlate, v.visitDate);
+      results.set(v.id, log);
+    })
+  );
+  return results;
+  */
+  return new Map();
+}
+
+// 현재 입차 중인 차량 목록 조회
+export async function fetchCurrentParkedVehicles() {
+  if (!IS_API_CONNECTED) return [];
+  // TODO: 실제 API 호출
+  return [];
+}
+
+================================================================
+FILE: access-api.js  (에스원 출입 API 연동 모듈 — 현재 미연결)
+================================================================
+// 에스원 스피드게이트 QR 카드 등록/삭제 API 연동 모듈
+// 에스원 내부망 주소: http://172.27.250.199:2450
+
+const ACCESS_API_CONFIG = {
+  baseUrl: 'http://172.27.250.199:2450',
+  apiKey: 'YOUR_API_KEY',
+  username: 'YOUR_USERNAME',
+  password: 'YOUR_PASSWORD',
+  endpoints: {
+    registerCard: '/api/card/register',
+    revokeCard:   '/api/card/revoke',
+  },
+};
+
+export const IS_ACCESS_API_CONNECTED = false;
+
+// 방문 승인 시 QR 카드 등록
+export async function registerVisitorCard(visit) {
+  if (!IS_ACCESS_API_CONNECTED) return false;
+  const payload = {
+    cardNumber:  visit.qrCode,        // 13자리 숫자
+    visitorName: visit.visitorName,
+    company:     visit.company || '',
+    validFrom:   new Date().toISOString(),
+    validUntil:  visit.qrExpiresAt || null,
+    visitDate:   visit.visitDate,
+  };
+  try {
+    const response = await fetch(
+      `${ACCESS_API_CONFIG.baseUrl}${ACCESS_API_CONFIG.endpoints.registerCard}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${ACCESS_API_CONFIG.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) throw new Error(`에스원 API 오류: ${response.status}`);
+    return true;
+  } catch (err) {
+    console.error('[에스원] QR 카드 등록 실패:', err);
+    return false;
+  }
+}
+
+// 승인 취소 시 QR 카드 삭제
+export async function revokeVisitorCard(qrCode) {
+  if (!IS_ACCESS_API_CONNECTED) return false;
+  try {
+    const response = await fetch(
+      `${ACCESS_API_CONFIG.baseUrl}${ACCESS_API_CONFIG.endpoints.revokeCard}`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${ACCESS_API_CONFIG.apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardNumber: qrCode }),
+      }
+    );
+    if (!response.ok) throw new Error(`에스원 API 오류: ${response.status}`);
+    return true;
+  } catch (err) {
+    console.error('[에스원] QR 카드 삭제 실패:', err);
+    return false;
+  }
+}
+
+================================================================
+FILE: main.js  (방문 신청 Web Component — 토큰 검증 + 신청 폼)
+================================================================
+import { db } from './firebase-config.js';
+import { collection, addDoc, query, where, getDocs, doc, updateDoc }
+  from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+// 사원정보 API 연동 완료 시 true로 변경 → 담당자 필수 선택 강제
+const IS_EMPLOYEE_API_CONNECTED = false;
+
+class VisitorRegistrationForm extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this._selectedHostEmpId = null;
+        this._selectedHostEmail = null;
+        this._token = null;
+        this._invitationDocId = null;
+        // [UI 생략 — Shadow DOM 내부 폼 HTML/CSS]
+    }
+
+    // 페이지 로드 시 URL의 ?token= 검증
+    connectedCallback() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        if (!token) {
+            this._blockForm('초대 링크를 통해서만 방문 신청이 가능합니다.');
+            return;
+        }
+        this._token = token;
+        this._validateToken(token);
+    }
+
+    async _validateToken(token) {
+        const q = query(collection(db, 'visitInvitations'), where('token', '==', token));
+        const snap = await getDocs(q);
+        if (snap.empty) { this._blockForm('유효하지 않은 초대 링크입니다.'); return; }
+        const data = snap.docs[0].data();
+        if (data.used) { this._blockForm('이미 사용된 초대 링크입니다.'); return; }
+        const expiresAt = data.expiresAt?.toDate?.() ?? null;
+        if (expiresAt && new Date() > expiresAt) { this._blockForm('만료된 초대 링크입니다.'); return; }
+        this._invitationDocId = snap.docs[0].id;
+    }
+
+    // 직원 검색: Firestore employees 컬렉션에서 성명으로 검색
+    // IS_EMPLOYEE_API_CONNECTED = true 시 이 부분을 사내 API 호출로 교체 예정
+    async _openModal() {
+        if (!this._employeeCache) {
+            const snapshot = await getDocs(collection(db, 'employees'));
+            this._employeeCache = snapshot.docs.map(d => d.data());
+        }
+        // 검색 UI 표시
+    }
+
+    // 폼 제출 → Firestore 저장 → 토큰 소모 → 담당자 알림 이메일 발송
+    async _handleSubmit(event) {
+        event.preventDefault();
+        const data = {
+            visitorName, company, contact, visitorEmail,
+            carPlates,           // string[]
+            visitDate,           // "YYYY-MM-DD"
+            visitTimeSlot,       // "HH:MM"
+            visitPurpose,
+            hostInfo,            // 담당자 표시명
+            hostEmpId: this._selectedHostEmpId,
+            timestamp: new Date(),
+        };
+
+        // 사원정보 API 연동 후 담당자 미선택 시 제출 차단
+        if (IS_EMPLOYEE_API_CONNECTED && !data.hostInfo) return;
+
+        await addDoc(collection(db, 'visitRequests'), data);
+
+        // 초대 토큰 1회 소모 처리
+        if (this._invitationDocId) {
+            updateDoc(doc(db, 'visitInvitations', this._invitationDocId), { used: true, usedAt: new Date() });
+        }
+
+        this._sendNotification(data); // GAS 이메일 발송 (비동기)
+        window.location.href = 'complete.html';
+    }
+
+    // GAS를 통한 담당자 이메일 알림
+    async _sendNotification(data) {
+        if (!this._selectedHostEmail) return;
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
+        await fetch(GAS_URL, {
+            method: 'POST', mode: 'no-cors', cache: 'no-cache', keepalive: true,
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ to: this._selectedHostEmail, visitor: data.visitorName, ... })
+        });
+    }
+}
+customElements.define('visitor-registration-form', VisitorRegistrationForm);
+
+================================================================
+FILE: admin.js  (관리자 대시보드 로직)
+================================================================
+import { db } from './firebase-config.js';
+import { collection, getDocs, doc, updateDoc, query, where, orderBy, addDoc }
+  from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { IS_API_CONNECTED, syncAllParkingLogs } from './parking-api.js';
+import { IS_ACCESS_API_CONNECTED, registerVisitorCard, revokeVisitorCard } from './access-api.js';
+
+const NOTIFICATION_CONFIG = {
+  channel: 'email',  // 향후 'sms' | 'kakao' 전환 가능
+  gasUrl: 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec',
+};
+
+// ── 인증 체크 (sessionStorage 기반) ──
+// sessionStorage 키: admin_authenticated, admin_role('super'|'staff'), admin_name, admin_empId
+document.addEventListener('DOMContentLoaded', async () => {
+  const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
+  if (isAuthenticated) showDashboard();
+  else showLogin();
+});
+
+// 로그인: 총관리자(admin/netmarble1!) 또는 일반담당자(성명+사번, Firestore employees 조회)
+async function handleLogin() {
+  const name = document.getElementById('adminNameInput').value.trim();
+  const password = document.getElementById('adminEmpIdInput').value.trim();
+
+  if (name === 'admin' && password === 'netmarble1!') {
+    sessionStorage.setItem('admin_authenticated', 'true');
+    sessionStorage.setItem('admin_role', 'super');
+    sessionStorage.setItem('admin_name', '총관리자');
+    showDashboard(); return;
+  }
+
+  // 임직원 인증: Firestore employees 컬렉션에서 성명+사번 검증
+  // IS_EMPLOYEE_API_CONNECTED = true 시 사내 API로 교체 예정
+  const q = query(collection(db, 'employees'), where('name', '==', name));
+  const snap = await getDocs(q);
+  snap.forEach(doc => {
+    const data = doc.data();
+    if (data.empId?.toUpperCase() === password.toUpperCase()) {
+      sessionStorage.setItem('admin_authenticated', 'true');
+      sessionStorage.setItem('admin_role', 'staff');
+      sessionStorage.setItem('admin_name', name);
+      sessionStorage.setItem('admin_empId', data.empId);
+      showDashboard();
+    }
+  });
+}
+
+// 방문 데이터 로드 (권한별 필터링)
+async function loadVisits() {
+  const role = sessionStorage.getItem('admin_role');
+  const myEmpId = sessionStorage.getItem('admin_empId');
+  const q = query(collection(db, 'visitRequests'), orderBy('timestamp', 'desc'));
+  const snapshot = await getDocs(q);
+  let rawData = snapshot.docs.map(d => ({ id: d.id, ...d.data(), ... }));
+
+  // staff는 본인 담당 방문만 조회
+  if (role !== 'super') {
+    const myName = sessionStorage.getItem('admin_name');
+    rawData = rawData.filter(v =>
+      v.hostEmpId?.toUpperCase() === myEmpId?.toUpperCase() ||
+      v.hostInfo?.includes(myName)
+    );
+  }
+  allVisits = rawData;
+  if (IS_API_CONNECTED) await mergeParkingLogs(); // 주차관제 API 연동 시 자동 동기화
+}
+
+// 방문 승인/취소 처리
+async function handleConfirmToggle(e) {
+  const btn = e.target.closest('.confirm-toggle');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const next = btn.dataset.confirmed !== 'true';
+  const visit = allVisits.find(v => v.id === id);
+  const updateData = { adminConfirmed: next };
+
+  if (next) {
+    // 승인: QR 코드 생성 + 방문 당일 자정 만료
+    const qrCode = generateQRCode(); // 13자리: 앞7자리 타임스탬프 + 뒤6자리 랜덤
+    updateData.qrCode = qrCode;
+    updateData.qrStatus = 'active';
+    updateData.qrIssuedAt = new Date().toISOString();
+    const expiry = new Date(`${visit.visitDate}T00:00:00+09:00`);
+    expiry.setDate(expiry.getDate() + 1);
+    updateData.qrExpiresAt = expiry.toISOString();
+  } else {
+    // 취소: QR 무효화
+    updateData.qrStatus = 'revoked';
+    updateData.qrExpiresAt = null;
+  }
+
+  await updateDoc(doc(db, 'visitRequests', id), updateData);
+
+  // 에스원 출입 API 연동 (IS_ACCESS_API_CONNECTED = true 시 자동 처리)
+  if (IS_ACCESS_API_CONNECTED) {
+    if (next) registerVisitorCard({ ...visit, ...updateData });
+    else revokeVisitorCard(visit.qrCode);
+  }
+
+  // 승인 시 방문객 이메일 발송
+  if (next && visit?.visitorEmail) sendApprovalNotification(visit);
+}
+
+// 입차/주차 등록 (API 미연결 시 수동 처리)
+async function handleParkingToggle(e) {
+  const entryBtn = e.target.closest('.parking-entry-btn');
+  const registerBtn = e.target.closest('.parking-register-btn');
+  if (!entryBtn && !registerBtn) return;
+
+  const id = (entryBtn || registerBtn).dataset.id;
+  const plate = (entryBtn || registerBtn).dataset.plate || null; // 다중 차량
+  const now = new Date();
+
+  if (plate) {
+    // 다중 차량: carEntries[차량번호] 업데이트
+    const carEntries = { ...(visit?.carEntries || {}) };
+    carEntries[plate] = { entryTime: now.toISOString(), parkingRegisteredAt: now.toISOString() };
+    await updateDoc(doc(db, 'visitRequests', id), { carEntries });
+  } else {
+    // 단일 차량
+    await updateDoc(doc(db, 'visitRequests', id), { entryTime: now, parkingRegisteredAt: now });
+  }
+}
+
+// 주차관제 API 동기화 (IS_API_CONNECTED = true 시 호출됨)
+async function mergeParkingLogs() {
+  const parkingMap = await syncAllParkingLogs(allVisits);
+  for (const visit of allVisits) {
+    const log = parkingMap.get(visit.id);
+    if (!log) continue;
+    // 변경 시 Firestore 업데이트
+    // TODO(에스원 API 연동): log.carEntries가 있으면 carEntries도 함께 저장
+    await updateDoc(doc(db, 'visitRequests', visit.id), { entryTime: log.entryTime, exitTime: log.exitTime });
+  }
+}
+
+// 초대 링크 생성 (admin 페이지에서도 생성 가능)
+async function openInviteModal() {
+  const token = await createInvitation();
+  const base = location.href.replace(/admin\.html.*$/, '');
+  document.getElementById('inviteLinkInput').value = `${base}register.html?token=${token}`;
+}
+
+function generateQRCode() {
+  const timestamp = String(Math.floor(Date.now() / 1000)).slice(0, 7);
+  const random = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+  return timestamp + random;
+}
+
+// 방문객 승인 알림 이메일 (GAS)
+async function sendApprovalNotification(visit) {
+  const payload = {
+    type: 'approval', to: visit.visitorEmail,
+    visitor: visit.visitorName, company: visit.company,
+    date: visit.visitDate, time: visit.visitTimeSlot,
+    htmlBody: buildApprovalEmailHtml(visit), // QR 코드 이미지 포함
+  };
+  await fetch(NOTIFICATION_CONFIG.gasUrl, {
+    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
+  });
+}
+
+================================================================
+FILE: index.html  (담당자 로그인 + 초대 링크 발송)
+================================================================
+// index.html 핵심 로직 (script 부분 요약)
+
+// 1. 인증 체크: sessionStorage.admin_authenticated === 'true' 시 메인 콘텐츠 표시
+// 2. 로그인:
+//    - 총관리자: name='admin', pw='netmarble1!'
+//    - 임직원: Firestore employees 컬렉션에서 성명+사번 검증
+// 3. 초대 링크 발송 (모달):
+//    - 24자리 랜덤 토큰 생성 → Firestore visitInvitations 저장 (3일 만료)
+//    - 이메일 발송: GAS URL로 POST
+//    - 또는 링크 직접 복사
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKYYQylpr7JmdVcePhaqMLFpif7CdObpRVtBKimIFQ3Q1XfSFDd3mXhCiXaMMD2l1wXg/exec';
+
+async function createInvitation() {
+  const token = Array.from({length: 24}, () =>
+    'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+  ).join('');
+  await addDoc(collection(db, 'visitInvitations'), {
+    token, createdAt: new Date(),
+    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 48시간 후
+    createdBy: sessionStorage.getItem('admin_name') || 'admin',
+    used: false,
+  });
+  return token;
+}
+
+================================================================
+## API 연동 포인트 요약 (현재 대기 중)
+================================================================
+
+1. 사원정보 API (nbs.nmn.io)
+   - 파일: main.js, admin.js
+   - 플래그: IS_EMPLOYEE_API_CONNECTED = false
+   - 현재: Firestore employees 컬렉션에서 검색
+   - 연동 후: IS_EMPLOYEE_API_CONNECTED = true → 담당자 필수 선택 강제
+   - 필요: 사내 SSO 인증 방식, API 엔드포인트, 응답 스키마
+
+2. 주차관제 API (업체 미정)
+   - 파일: parking-api.js
+   - 플래그: IS_API_CONNECTED = false
+   - 현재: 수동 입차/주차등록 버튼
+   - 연동 후: 30초마다 자동 동기화
+   - 필요: API URL, 인증키, 입출차 조회 엔드포인트
+
+3. 에스원 출입 API (내부망: 172.27.250.199:2450)
+   - 파일: access-api.js
+   - 플래그: IS_ACCESS_API_CONNECTED = false
+   - 연동 후: 승인 시 QR 카드 자동 등록, 취소 시 자동 삭제
+   - 필요: 엔드포인트 경로, 인증 방식(API Key or ID/PW), 요청 필드명
+
+4. Okta SSO (사내 인증)
+   - 현재: 하드코딩 로그인
+   - 연동 예정: Okta OIDC + PKCE (SPA 방식)
+   - 필요: IT팀에 Okta SPA 앱 등록 요청 → Client ID + Issuer URL 수령
+
+================================================================
+## Gemini에게 요청할 내용 (예시)
+================================================================
+- "nbs.nmn.io 사내 API와 연동해서 직원 검색 기능을 구현해줘"
+- "IS_EMPLOYEE_API_CONNECTED = true 로 변경할 때 수정해야 할 코드를 알려줘"
+- "에스원 API 스펙이 이렇게 생겼을 때 access-api.js를 완성해줘"
+- "Okta OIDC PKCE 플로우로 index.html 로그인을 교체해줘"
