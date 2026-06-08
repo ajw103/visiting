@@ -426,8 +426,7 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.querySelector('#addCarBtn').addEventListener('click', this._addCarRow.bind(this));
 
         // 검색 모달 관련 이벤트 리스너
-        this.shadowRoot.querySelector('#hostInfo').addEventListener('click', () => this._openModal());
-        this.shadowRoot.querySelector('#hostInfo').addEventListener('focus', (e) => { e.target.blur(); this._openModal(); }); // 포커스 시에도 모달 오픈
+        this.shadowRoot.querySelector('#openHostSearchBtn').addEventListener('click', () => this._openModal());
         this.shadowRoot.querySelector('#closeModal').addEventListener('click', () => this._closeModal());
         this.shadowRoot.querySelector('#hostSearchBtn').addEventListener('click', () => this._searchHost());
         this.shadowRoot.querySelector('#hostSearchInput').addEventListener('keypress', (e) => {
