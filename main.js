@@ -389,8 +389,12 @@ class VisitorRegistrationForm extends HTMLElement {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="hostInfo">담당직원</label>
-                        <input type="text" id="hostInfo" name="hostInfo" placeholder="*담당 직원의 성함을 입력해 주세요" required readonly>
+                        <label>담당직원</label>
+                        <div class="host-input-row">
+                            <input type="text" id="hostDept" name="hostDept" placeholder="부서명">
+                            <input type="text" id="hostName" name="hostName" placeholder="성함 (필수)" required>
+                            <button type="button" class="search-host-btn" id="openHostSearchBtn">직원 검색</button>
+                        </div>
                     </div>
                 </div>
 
