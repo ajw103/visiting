@@ -415,22 +415,6 @@ class VisitorRegistrationForm extends HTMLElement {
                 <button type="submit" class="submit-btn" style="margin-top: 1rem;">방문 신청</button>
             </form>
 
-            <!-- 직원 검색 모달 -->
-            <div id="hostModal" class="modal-overlay">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>담당 직원 검색</h3>
-                        <button type="button" class="close-modal" id="closeModal">&times;</button>
-                    </div>
-                    <div class="search-box">
-                        <input type="text" id="hostSearchInput" placeholder="직원 성명을 정확히 입력하세요">
-                        <button type="button" class="search-btn" id="hostSearchBtn">검색</button>
-                    </div>
-                    <div class="search-results" id="hostSearchResults">
-                        <div class="no-result">성명을 입력하고 검색 버튼을 누르세요.</div>
-                    </div>
-                </div>
-            </div>
         `;
 
         this.shadowRoot.appendChild(style);
