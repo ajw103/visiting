@@ -1,8 +1,15 @@
 import { db } from './firebase-config.js';
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-// 사원정보 API 연동 완료 시 true로 변경
-const IS_EMPLOYEE_API_CONNECTED = false;
+// ================================================================
+// 사원정보 API 설정
+// IT팀에서 xapikey 발급받으면:
+//   1. EMPLOYEE_API_KEY 값을 발급받은 키로 교체
+//   2. IS_EMPLOYEE_API_CONNECTED 를 true 로 변경
+// ================================================================
+const EMPLOYEE_API_BASE = 'https://nbs-api.nmn.io';
+const EMPLOYEE_API_KEY  = 'YOUR_XAPI_KEY_HERE';   // ← IT팀 발급 키로 교체
+const IS_EMPLOYEE_API_CONNECTED = false;           // ← true 로 변경
 
 const TIME_SLOTS = [
     '09:00 ~ 10:00',
