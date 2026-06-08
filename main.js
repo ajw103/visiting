@@ -423,21 +423,18 @@ class VisitorRegistrationForm extends HTMLElement {
         this.shadowRoot.querySelector('#visitorForm').addEventListener('submit', this._handleSubmit.bind(this));
         this.shadowRoot.querySelector('#addCarBtn').addEventListener('click', this._addCarRow.bind(this));
 
-        // 검색 모달 관련 이벤트 리스너
-        this.shadowRoot.querySelector('#openHostSearchBtn').addEventListener('click', () => this._openModal());
-        this.shadowRoot.querySelector('#closeModal').addEventListener('click', () => this._closeModal());
-        this.shadowRoot.querySelector('#hostSearchBtn').addEventListener('click', () => this._searchHost());
-        this.shadowRoot.querySelector('#hostSearchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); this._searchHost(); }
-        });
-        this.shadowRoot.querySelector('#hostModal').addEventListener('click', (e) => {
-            if (e.target.id === 'hostModal') this._closeModal();
-        });
+        // 직원 확인 버튼
+        this.shadowRoot.querySelector('#openHostSearchBtn').addEventListener('click', () => this._verifyHost());
 
-        // 직원 데이터 로드 (이제 Firestore 실시간 쿼리를 사용하므로 초기 로드는 필요 없음)
+        // 부서/성함 변경 시 확인 상태 초기화
+        const resetVerification = () => this._resetVerification();
+        this.shadowRoot.querySelector('#hostDept').addEventListener('input', resetVerification);
+        this.shadowRoot.querySelector('#hostName').addEventListener('input', resetVerification);
+
         this._hosts = [];
         this._token = null;
         this._invitationDocId = null;
+        this._hostVerified = false;
     }
 
     connectedCallback() {
