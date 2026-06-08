@@ -412,7 +412,7 @@ class VisitorRegistrationForm extends HTMLElement {
                     <div class="form-group">
                         <label>담당직원</label>
                         <div class="host-input-row">
-                            <input type="text" id="hostDept" name="hostDept" placeholder="부서명">
+                            <input type="text" id="hostDept" name="hostDept" placeholder="부서명" required>
                             <input type="text" id="hostName" name="hostName" placeholder="성함 (필수)" required>
                             <button type="button" class="search-host-btn" id="openHostSearchBtn">직원 검색</button>
                         </div>
