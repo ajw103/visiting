@@ -609,15 +609,17 @@ class VisitorRegistrationForm extends HTMLElement {
             expireAt:      new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000), // 5년 후 자동 삭제
         };
 
-        // 사원정보 API 연동 후에는 담당자 미선택(직접 입력도 불가) 시 제출 차단
-        if (IS_EMPLOYEE_API_CONNECTED && !this._selectedHostEmpId) {
-            const nameInput = this.shadowRoot.querySelector('#hostName');
-            nameInput.style.borderColor = '#dc3545';
-            nameInput.placeholder = '직원 검색 버튼으로 담당자를 선택해 주세요.';
+        // 직원 확인 완료 상태가 아니면 제출 차단
+        if (!this._hostVerified) {
+            const verifyBtn = this.shadowRoot.querySelector('#openHostSearchBtn');
+            verifyBtn.className = 'search-host-btn unverified';
+            verifyBtn.textContent = '직원 확인 필요';
             setTimeout(() => {
-                nameInput.style.borderColor = '';
-                nameInput.placeholder = '성함 (필수)';
-            }, 3000);
+                if (!this._hostVerified) {
+                    verifyBtn.className = 'search-host-btn';
+                    verifyBtn.textContent = '직원 검색';
+                }
+            }, 2000);
             return;
         }
 
