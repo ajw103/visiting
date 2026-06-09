@@ -955,21 +955,20 @@ function renderTable() {
 }
 
 // ──────────────────────────────────────────────
-// 요약 카드 업데이트
+// 승인 알림 배너 업데이트
 // ──────────────────────────────────────────────
 function updateSummary() {
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const monthPrefix = todayStr.substring(0, 7);
+  const pendingCount = allVisits.filter(v => v.adminConfirmed !== true).length;
+  const banner = document.getElementById('pendingAlert');
+  const textEl = document.getElementById('pendingAlertText');
+  if (!banner || !textEl) return;
 
-  const todayVisits = allVisits.filter(v => v.visitDate === todayStr);
-  const monthVisits = allVisits.filter(v => v.visitDate && v.visitDate.startsWith(monthPrefix));
-
-  const todayCountEl = document.getElementById('todayCount');
-  const monthCountEl = document.getElementById('monthCount');
-  
-  if (todayCountEl) todayCountEl.textContent = todayVisits.length;
-  if (monthCountEl) monthCountEl.textContent = monthVisits.length;
+  if (pendingCount > 0) {
+    textEl.textContent = `방문 승인이 필요한 신청이 ${pendingCount}건 있습니다.`;
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
 }
 
 // ──────────────────────────────────────────────
