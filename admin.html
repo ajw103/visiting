@@ -622,6 +622,27 @@
       .cal-visit-badge { font-size: 0.55rem; }
     }
 
+    /* ── 승인 알림 배너 ── */
+    .pending-alert {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: #664d03;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .pending-alert:hover { background: #ffe69c; }
+    .pending-alert .alert-icon { font-size: 1rem; flex-shrink: 0; }
+    .pending-alert strong { color: #5a3e00; }
+    .pending-alert .alert-hint { margin-left: auto; font-size: 0.78rem; color: #856404; white-space: nowrap; }
+    .pending-alert.hidden { display: none; }
+
     /* ── API 상태 배너 ── */
     .api-info-banner {
       background: #fff3cd;
