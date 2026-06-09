@@ -705,10 +705,12 @@
             try {
                 const token = await createInvitation();
                 const link  = getTokenLink(token);
-                location.href = link;
+                await navigator.clipboard.writeText(link);
+                closeShareModal();
+                showToast('✅ 초대 링크가 복사되었습니다!');
             } catch (err) {
-                console.error('링크 생성 오류:', err);
-                showToast('오류가 발생했습니다. 다시 시도해 주세요.');
+                console.error('복사 오류:', err);
+                showToast('복사에 실패했습니다. 다시 시도해 주세요.');
                 btn.disabled = false;
                 btn.textContent = '📋 \u00a0링크 직접 복사하기';
             }
