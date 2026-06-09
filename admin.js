@@ -616,6 +616,7 @@ async function loadVisits() {
 
     applyFilter('upcoming'); // 기본적으로 오늘 이후 예정 건을 모두 보여줌
     updateSummary();
+    renderCalendar();
   } catch (err) {
     console.error('데이터 로드 실패:', err);
     showToast('데이터를 불러오는 데 실패했습니다.', 'error');
