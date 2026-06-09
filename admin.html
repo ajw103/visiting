@@ -565,19 +565,61 @@
       font-weight: 700;
     }
     .cal-visit-badge {
-      font-size: 0.68rem;
+      font-size: 0.6rem;
       background: rgba(0,123,255,0.12);
       color: var(--primary);
       border-radius: 10px;
-      padding: 1px 5px;
+      padding: 0 4px;
       font-weight: 600;
       white-space: nowrap;
+      line-height: 1.4;
     }
+    /* 월 선택 팝업 */
+    .cal-month-picker {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 0.85rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      z-index: 200;
+      min-width: 210px;
+    }
+    .cal-month-picker.open { display: block; }
+    .cal-picker-year-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 0.65rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .cal-picker-months {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+    }
+    .cal-month-btn {
+      padding: 0.35rem 0.2rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+      font-size: 0.8rem;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .cal-month-btn:hover { background: var(--gray-100); }
+    .cal-month-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
     @media (max-width: 600px) {
-      .calendar-wrapper { padding: 0.75rem; }
-      .cal-day { min-height: 44px; }
-      .cal-day-num { font-size: 0.8rem; }
-      .cal-visit-badge { font-size: 0.62rem; }
+      .calendar-wrapper { padding: 0.6rem; }
+      .cal-day { min-height: 32px; }
+      .cal-day-num { font-size: 0.7rem; width: 20px; height: 20px; }
+      .cal-visit-badge { font-size: 0.55rem; }
     }
 
     /* ── API 상태 배너 ── */
