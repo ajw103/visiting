@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -703,15 +703,19 @@
             btn.disabled = true;
             btn.textContent = '링크 생성 중...';
 
+            // 팝업 차단 방지: 클릭 이벤트 내에서 즉시 창 열기
+            const newWin = window.open('', '_blank');
             try {
                 const token = await createInvitation();
                 const link  = getTokenLink(token);
-                await navigator.clipboard.writeText(link);
+                try { await navigator.clipboard.writeText(link); } catch (_) {}
+                if (newWin) newWin.location.href = link;
                 closeShareModal();
-                showToast('✅ 초대 링크가 복사되었습니다!');
+                showToast('✅ 방문 신청 페이지가 열렸습니다. 링크도 복사되었습니다.');
             } catch (err) {
-                console.error('복사 오류:', err);
-                showToast('복사에 실패했습니다. 다시 시도해 주세요.');
+                console.error('링크 생성 오류:', err);
+                if (newWin) newWin.close();
+                showToast('오류가 발생했습니다. 다시 시도해 주세요.');
                 btn.disabled = false;
                 btn.textContent = '📋 \u00a0링크 직접 복사하기';
             }
