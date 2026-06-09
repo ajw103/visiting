@@ -34,6 +34,9 @@ const NOTIFICATION_CONFIG = {
 // ──────────────────────────────────────────────
 let allVisits = [];          // Firestore에서 불러온 전체 방문 신청 목록
 let filteredVisits = [];     // 검색/필터 적용 후 표시할 목록
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let selectedCalDate = null;  // 달력에서 선택된 날짜 ('YYYY-MM-DD' or null)
 
 // ──────────────────────────────────────────────
 // 초기화 및 인증 체크
