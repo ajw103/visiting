@@ -705,10 +705,9 @@ function applyFilter(type = 'search') {
   const recordCountEl = document.getElementById('recordCount');
   if (recordCountEl) {
     let label = '전체 검색 결과';
-    if (type === 'today') label = '오늘 방문 예정';
-    else if (type === 'upcoming') label = '진행 및 예정된 전체 방문';
-    else if (type === 'month') label = '이번 달 방문';
+    if (type === 'upcoming') label = '진행 및 예정된 전체 방문';
     else if (type === 'calendar' && selectedCalDate) label = `${selectedCalDate} 방문 예정`;
+    else if (type === 'pending') label = '승인 대기 중인 신청';
 
     recordCountEl.textContent = `${label}: ${filteredVisits.length}건`;
   }
