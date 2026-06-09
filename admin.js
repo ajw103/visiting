@@ -164,11 +164,14 @@ function bindEvents() {
     });
   }
 
-  // 요약 카드 클릭 이벤트
-  const todayCard = document.getElementById('todayCard');
-  if (todayCard) todayCard.addEventListener('click', () => applyFilter('today'));
-  const monthCard = document.getElementById('monthCard');
-  if (monthCard) monthCard.addEventListener('click', () => applyFilter('month'));
+  // 승인 알림 배너 클릭 → 미승인 건만 검색
+  const pendingAlert = document.getElementById('pendingAlert');
+  if (pendingAlert) {
+    pendingAlert.addEventListener('click', () => {
+      document.getElementById('searchInput').value = '';
+      applyFilter('pending');
+    });
+  }
 
   // 방문 초대 링크 모달
   const inviteBtn = document.getElementById('inviteBtn');
