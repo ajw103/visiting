@@ -169,6 +169,7 @@ function bindEvents() {
     pendingAlert.addEventListener('click', () => {
       document.getElementById('searchInput').value = '';
       applyFilter('pending');
+      document.querySelector('.table-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
 
