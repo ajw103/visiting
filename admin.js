@@ -147,7 +147,6 @@ function handleLogout() {
 }
 
 function bindEvents() {
-  document.getElementById('refreshBtn').addEventListener('click', loadVisits);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
   document.getElementById('visitTableBody').addEventListener('click', handleConfirmToggle);
   document.getElementById('visitTableBody').addEventListener('click', handleParkingToggle);
