@@ -186,6 +186,8 @@ function bindEvents() {
       msg.textContent = '복사 실패. 직접 선택 후 Ctrl+C 해주세요.';
     });
   });
+
+  initCalendar();
 }
 
 async function handleConfirmToggle(e) {
