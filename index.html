@@ -709,7 +709,11 @@
                 const token = await createInvitation();
                 const link  = getTokenLink(token);
                 await navigator.clipboard.writeText(link);
-                closeShareModal();
+                btn.disabled = false;
+                btn.textContent = '✅ 복사 완료!';
+                setTimeout(() => {
+                    btn.textContent = '📋  링크 직접 복사하기';
+                }, 2000);
                 showToast('✅ 초대 링크가 복사되었습니다!');
             } catch (err) {
                 console.error('복사 오류:', err);
