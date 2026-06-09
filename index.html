@@ -654,8 +654,7 @@
         }
 
         function getTokenLink(token) {
-            const base = location.href.replace(/index\.html.*$/, '').replace(/\/?$/, '/');
-            return `${base}register.html?token=${token}`;
+            return `${location.origin}/register.html?token=${token}`;
         }
 
         // ── 이메일 발송 ──
