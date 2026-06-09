@@ -92,12 +92,18 @@
     /* ── Main ── */
     .main-content { padding: 1.5rem 2rem; max-width: 1400px; margin: 0 auto; }
 
-    /* ── Summary Cards ── */
-    .summary-grid {
+    /* ── Top Section (요약 카드 + 달력) ── */
+    .top-section {
       display: grid;
-      grid-template-columns: 1.5fr 1fr; /* 오늘을 더 크게 */
+      grid-template-columns: 200px 1fr;
       gap: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      align-items: start;
+    }
+    .summary-cards-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
     .summary-card {
       background: #fff;
