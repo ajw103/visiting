@@ -770,6 +770,25 @@ function renderCalendar() {
   });
 }
 
+function renderMonthPicker() {
+  document.getElementById('pickerYear').textContent = `${pickerYear}년`;
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const el = document.getElementById('pickerMonths');
+  el.innerHTML = months.map((m, i) =>
+    `<button class="cal-month-btn ${pickerYear === calYear && i === calMonth ? 'active' : ''}" data-month="${i}">${m}</button>`
+  ).join('');
+  el.querySelectorAll('.cal-month-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calYear = pickerYear;
+      calMonth = parseInt(btn.dataset.month);
+      selectedCalDate = null;
+      document.getElementById('calMonthPicker').classList.remove('open');
+      renderCalendar();
+      applyFilter('upcoming');
+    });
+  });
+}
+
 function initCalendar() {
   document.getElementById('calPrevBtn').addEventListener('click', () => {
     calMonth--;
@@ -790,6 +809,29 @@ function initCalendar() {
     renderCalendar();
     applyFilter('upcoming');
   });
+
+  // 제목 클릭 → 월 선택 팝업
+  const titleEl = document.getElementById('calTitle');
+  const picker  = document.getElementById('calMonthPicker');
+  titleEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pickerYear = calYear;
+    renderMonthPicker();
+    picker.classList.toggle('open');
+  });
+  document.getElementById('pickerPrevYear').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pickerYear--;
+    renderMonthPicker();
+  });
+  document.getElementById('pickerNextYear').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pickerYear++;
+    renderMonthPicker();
+  });
+  document.addEventListener('click', () => picker.classList.remove('open'));
+  picker.addEventListener('click', (e) => e.stopPropagation());
+
   renderCalendar();
 }
 
