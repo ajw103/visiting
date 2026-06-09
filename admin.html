@@ -722,35 +722,47 @@
       </div>
     </div>
 
-    <!-- 요약 카드 -->
-    <div class="summary-grid">
-      <div class="summary-card today" id="todayCard">
-        <div class="label">오늘 방문 예정</div>
-        <div class="value" id="todayCount">-</div>
+    <!-- 상단: 요약 카드 + 달력 -->
+    <div class="top-section">
+      <!-- 요약 카드 -->
+      <div class="summary-cards-col">
+        <div class="summary-card today" id="todayCard">
+          <div class="label">오늘 방문 예정</div>
+          <div class="value" id="todayCount">-</div>
+        </div>
+        <div class="summary-card month" id="monthCard">
+          <div class="label">이번 달 방문</div>
+          <div class="value" id="monthCount">-</div>
+        </div>
+        <div class="summary-card entered" style="display:none">
+          <div class="label">현재 입차중</div>
+          <div class="value" id="enteredCount">-</div>
+        </div>
+        <div class="summary-card exited" style="display:none">
+          <div class="label">출차 완료</div>
+          <div class="value" id="exitedCount">-</div>
+        </div>
       </div>
-      <div class="summary-card month" id="monthCard">
-        <div class="label">이번 달 방문</div>
-        <div class="value" id="monthCount">-</div>
-      </div>
-      <div class="summary-card entered" style="display:none">
-        <div class="label">현재 입차중</div>
-        <div class="value" id="enteredCount">-</div>
-      </div>
-      <div class="summary-card exited" style="display:none">
-        <div class="label">출차 완료</div>
-        <div class="value" id="exitedCount">-</div>
-      </div>
-    </div>
 
-    <!-- 달력 -->
-    <div class="calendar-wrapper">
-      <div class="calendar-header">
-        <button class="cal-nav-btn" id="calPrevBtn">&#8249;</button>
-        <span id="calTitle"></span>
-        <button class="cal-nav-btn" id="calNextBtn">&#8250;</button>
-        <button class="btn btn-outline cal-reset-btn" id="calResetBtn">전체 보기</button>
+      <!-- 달력 -->
+      <div class="calendar-wrapper">
+        <div class="calendar-header">
+          <button class="cal-nav-btn" id="calPrevBtn">&#8249;</button>
+          <span id="calTitle"></span>
+          <button class="cal-nav-btn" id="calNextBtn">&#8250;</button>
+          <button class="btn btn-outline cal-reset-btn" id="calResetBtn">전체 보기</button>
+          <!-- 월 선택 팝업 -->
+          <div class="cal-month-picker" id="calMonthPicker">
+            <div class="cal-picker-year-row">
+              <button class="cal-nav-btn" id="pickerPrevYear">&#8249;</button>
+              <span id="pickerYear"></span>
+              <button class="cal-nav-btn" id="pickerNextYear">&#8250;</button>
+            </div>
+            <div class="cal-picker-months" id="pickerMonths"></div>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
       </div>
-      <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
     <!-- 필터 바 -->
