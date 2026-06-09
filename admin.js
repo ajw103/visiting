@@ -656,7 +656,7 @@ async function mergeParkingLogs() {
 function applyFilter(type = 'search') {
   const searchInput = document.getElementById('searchInput');
   const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
-  
+
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
   const monthPrefix = todayStr.substring(0, 7);
@@ -670,6 +670,8 @@ function applyFilter(type = 'search') {
       if (!v.visitDate || v.visitDate < todayStr) return false;
     } else if (type === 'month') {
       if (!v.visitDate || !v.visitDate.startsWith(monthPrefix)) return false;
+    } else if (type === 'calendar') {
+      if (!selectedCalDate || v.visitDate !== selectedCalDate) return false;
     }
     // 'search' 타입은 전체 데이터를 기준으로 함 (기간 필터 무시)
 
@@ -677,11 +679,11 @@ function applyFilter(type = 'search') {
     if (searchVal) {
       const matchName = v.visitorName?.toLowerCase().includes(searchVal);
       const matchComp = v.company?.toLowerCase().includes(searchVal);
-      const matchCar  = Array.isArray(v.carPlates) 
+      const matchCar  = Array.isArray(v.carPlates)
                         ? v.carPlates.some(p => p?.toLowerCase().includes(searchVal))
                         : v.carPlate?.toLowerCase().includes(searchVal);
       const matchHost = (v.hostInfo ?? v.hostName)?.toLowerCase().includes(searchVal);
-      
+
       if (!matchName && !matchComp && !matchCar && !matchHost) return false;
     }
 
@@ -689,7 +691,7 @@ function applyFilter(type = 'search') {
   });
 
   renderTable();
-  
+
   // 기록 건수 업데이트
   const recordCountEl = document.getElementById('recordCount');
   if (recordCountEl) {
@@ -697,9 +699,94 @@ function applyFilter(type = 'search') {
     if (type === 'today') label = '오늘 방문 예정';
     else if (type === 'upcoming') label = '진행 및 예정된 전체 방문';
     else if (type === 'month') label = '이번 달 방문';
-    
+    else if (type === 'calendar' && selectedCalDate) label = `${selectedCalDate} 방문 예정`;
+
     recordCountEl.textContent = `${label}: ${filteredVisits.length}건`;
   }
+}
+
+// ──────────────────────────────────────────────
+// 달력
+// ──────────────────────────────────────────────
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const titleEl = document.getElementById('calTitle');
+  if (!grid || !titleEl) return;
+
+  titleEl.textContent = `${calYear}년 ${calMonth + 1}월`;
+
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const headers = dayNames.map((d, i) =>
+    `<div class="cal-day-header ${i===0?'sun':i===6?'sat':''}">${d}</div>`
+  ).join('');
+
+  const firstWeekday = new Date(calYear, calMonth, 1).getDay();
+  const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // 날짜별 방문 건수 집계
+  const countMap = {};
+  allVisits.forEach(v => {
+    if (v.visitDate) countMap[v.visitDate] = (countMap[v.visitDate] || 0) + 1;
+  });
+
+  const empties = Array(firstWeekday).fill('<div class="cal-day empty"></div>');
+
+  const dayCells = [];
+  for (let d = 1; d <= lastDate; d++) {
+    const mm = String(calMonth + 1).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    const dateStr = `${calYear}-${mm}-${dd}`;
+    const count = countMap[dateStr] || 0;
+    const dow = new Date(calYear, calMonth, d).getDay();
+    const classes = [
+      'cal-day',
+      dow === 0 ? 'sun' : dow === 6 ? 'sat' : '',
+      dateStr === todayStr ? 'today' : '',
+      dateStr === selectedCalDate ? 'selected' : '',
+    ].filter(Boolean).join(' ');
+    const badge = count > 0 ? `<span class="cal-visit-badge">${count}명</span>` : '';
+    dayCells.push(`<div class="${classes}" data-date="${dateStr}"><div class="cal-day-num">${d}</div>${badge}</div>`);
+  }
+
+  grid.innerHTML = headers + empties.join('') + dayCells.join('');
+
+  grid.querySelectorAll('.cal-day:not(.empty)').forEach(el => {
+    el.addEventListener('click', () => {
+      const date = el.dataset.date;
+      if (selectedCalDate === date) {
+        selectedCalDate = null;
+        applyFilter('upcoming');
+      } else {
+        selectedCalDate = date;
+        applyFilter('calendar');
+      }
+      renderCalendar();
+    });
+  });
+}
+
+function initCalendar() {
+  document.getElementById('calPrevBtn').addEventListener('click', () => {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    selectedCalDate = null;
+    renderCalendar();
+    applyFilter('upcoming');
+  });
+  document.getElementById('calNextBtn').addEventListener('click', () => {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    selectedCalDate = null;
+    renderCalendar();
+    applyFilter('upcoming');
+  });
+  document.getElementById('calResetBtn').addEventListener('click', () => {
+    selectedCalDate = null;
+    renderCalendar();
+    applyFilter('upcoming');
+  });
+  renderCalendar();
 }
 
 // ──────────────────────────────────────────────
