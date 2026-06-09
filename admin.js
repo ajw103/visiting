@@ -679,6 +679,8 @@ function applyFilter(type = 'search') {
       if (!v.visitDate || !v.visitDate.startsWith(monthPrefix)) return false;
     } else if (type === 'calendar') {
       if (!selectedCalDate || v.visitDate !== selectedCalDate) return false;
+    } else if (type === 'pending') {
+      if (v.adminConfirmed === true) return false;
     }
     // 'search' 타입은 전체 데이터를 기준으로 함 (기간 필터 무시)
 
