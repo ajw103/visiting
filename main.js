@@ -623,7 +623,7 @@ class VisitorRegistrationForm extends HTMLElement {
             visitorName:   formData.get('visitorName'),
             company:       formData.get('company'),
             contact:       formData.get('contact'),
-            visitorEmail:  formData.get('visitorEmail') || null, // 승인 결과 알림용 이메일 (선택)
+            visitorEmail:  formData.get('visitorEmail'),
             carPlates,
             visitDate:     formData.get('visitDate'),
             visitTimeSlot: `${visitHour}:${visitMinute}`,
