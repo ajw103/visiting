@@ -506,8 +506,7 @@ async function openInviteModal() {
 
   try {
     const token = await createInvitation();
-    const base = location.href.replace(/admin\.html.*$/, '');
-    input.value = `${base}register.html?token=${token}`;
+    input.value = `${location.origin}/register.html?token=${token}`;
   } catch (err) {
     console.error('초대 링크 생성 실패:', err);
     input.value = '오류가 발생했습니다. 다시 시도해 주세요.';
