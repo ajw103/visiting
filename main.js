@@ -366,8 +366,8 @@ class VisitorRegistrationForm extends HTMLElement {
                         <input type="tel" id="contact" name="contact" required>
                     </div>
                     <div class="form-group">
-                        <label for="visitorEmail">이메일 <span style="font-weight:normal; color:#6c757d; font-size:0.85rem;">(선택)</span></label>
-                        <input type="email" id="visitorEmail" name="visitorEmail" placeholder="담당자 승인 결과가 메일로 안내 됩니다.">
+                        <label for="visitorEmail">이메일</label>
+                        <input type="email" id="visitorEmail" name="visitorEmail" placeholder="승인 결과가 이메일로 안내됩니다." required>
                     </div>
                     <div class="form-group" id="carPlateGroup">
                         <label>차량 번호 (예: 12가 3456)</label>
